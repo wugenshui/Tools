@@ -1,0 +1,195 @@
+﻿<%-- 
+Project: HuaweiSoftware Reader
+Name: Model
+Author: 陈博
+Description: 2017-02-08  Version 1.0
+--%>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="" %>
+<%@ Property Name="Namespace" Type="System.String" Default="HuaweiSoftware.EMMS_JCW.SDMSEntity" Optional="False" Category="基本设置" Description="命名空间" %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="参数设置" Description="数据表" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+//*******************************************
+//File   : <%=GetFileName()%>
+//Author : 陈博
+//Date   : <%=DateTime.Now%>
+//*******************************************
+using System;
+using System.Collections.Generic;
+
+namespace <%=Namespace%>
+{
+	public partial class <%=GetClassName(SourceTable)%>Info
+	{
+        #region 成员变量
+            
+	<%
+		foreach(ColumnSchema col in SourceTable.Columns)
+        {
+    %>
+        private <%=GetCSharpDataTypeByDbColumn(col)%> m_<%=ConvertToPascal(col.Name)%> = <%=GetDefaultValue(col) %>;
+    <%         
+        }
+    %>
+    
+        #endregion
+        
+        #region 属性
+        
+    <%
+		foreach(ColumnSchema col in SourceTable.Columns)
+        {
+    %>
+        /// <summary>
+        /// <%=col.Description %>
+        /// </summary>
+        public <%=GetCSharpDataTypeByDbColumn(col)%> <%=ConvertToPascal(col.Name)%> 
+        {
+            get { return m_<%=ConvertToPascal(col.Name)%>; }
+            set { m_<%=ConvertToPascal(col.Name)%> = value; }
+        }
+    <%         
+        }
+    %>
+        #endregion
+	}
+}
+<script runat="template">
+	//Pascal命名法, 首字母大写
+	public string ConvertToPascal(string str)
+	{
+		return str.Substring(0,1).ToUpper() + str.Substring(1);
+	}
+	//获取类名
+	public string GetClassName(TableSchema table)
+	{
+		return ConvertToPascal(table.Name.Substring(table.Name.IndexOf("_")+1));
+	}
+    //获取表名
+	public string GetTableName(TableSchema table)
+	{
+		return ConvertToPascal(table.Name);
+	}
+	//列数据类型 -> C#数据类型
+	public string GetCSharpDataTypeByDbColumn(ColumnSchema column)
+	{
+        string nullString = "";
+        if(column.AllowDBNull) nullString = "?";
+        
+		switch (column.DataType)
+		{
+			case DbType.AnsiString: return "string";
+			case DbType.AnsiStringFixedLength: return "string";
+			case DbType.Binary: return "byte[]" + nullString;
+			case DbType.Boolean: return "bool" + nullString;
+			case DbType.Byte: return "byte" + nullString;
+			case DbType.Currency: return "decimal" + nullString;
+			case DbType.Date: return "DateTime" + nullString;
+			case DbType.DateTime: return "DateTime" + nullString;
+			case DbType.Decimal: return "decimal" + nullString;
+			case DbType.Double: return "double" + nullString;
+			case DbType.Guid: return "Guid" + nullString;
+			case DbType.Int16: return "short" + nullString;
+			case DbType.Int32: return "int" + nullString;
+			case DbType.Int64: return "long" + nullString;
+			case DbType.Object: return "object";
+			case DbType.SByte: return "sbyte" + nullString;
+			case DbType.Single: return "float" + nullString;
+			case DbType.String: return "string";
+			case DbType.StringFixedLength: return "string";
+			case DbType.Time: return "TimeSpan" + nullString;
+			case DbType.UInt16: return "ushort" + nullString;
+			case DbType.UInt32: return "uint" + nullString;
+			case DbType.UInt64: return "ulong" + nullString;
+			case DbType.VarNumeric: return "decimal" + nullString;
+			default:
+			{
+				return "__UNKNOWN__" + column.NativeType;
+			}
+		}
+	}
+    //列数据类型 -> C#数据类型
+	public string GetDefaultValue(ColumnSchema column)
+	{
+        string nullString = "string.Empty";
+        if(column.AllowDBNull) nullString = "?";
+        
+		switch (column.DataType)
+		{
+			case DbType.AnsiString:
+			case DbType.AnsiStringFixedLength:
+            case DbType.String:
+			case DbType.StringFixedLength:
+                return "string.Empty";
+			case DbType.Boolean: 
+                return "false";
+			case DbType.Byte: 
+                return "1";
+			case DbType.Currency: return "decimal" + nullString;
+			case DbType.Date: 
+			case DbType.DateTime: 
+            case DbType.Time:
+                return "Common.CommonHelper.DefaultDateTime";
+			case DbType.Decimal: return "decimal" + nullString;
+			case DbType.Double: 
+            case DbType.Int16:
+			case DbType.Int32:
+			case DbType.Int64:
+            case DbType.VarNumeric:
+                return "0";
+			case DbType.Guid: return "Guid" + nullString;
+			case DbType.Object: return "object";
+			case DbType.SByte: return "sbyte" + nullString;
+			case DbType.Single: return "float" + nullString;
+			case DbType.Binary: return "byte[]" + nullString;
+			case DbType.UInt16: return "ushort" + nullString;
+			case DbType.UInt32: return "uint" + nullString;
+			case DbType.UInt64: return "ulong" + nullString;
+			
+			default:
+			{
+				return "__UNKNOWN__" + column.NativeType;
+			}
+		}
+	}
+	//列数据类型 -> SQLServer数据类型
+	public string GetSqlDataTypeByDbColumn(ColumnSchema column)
+	{
+		switch (column.DataType)
+		{
+			case DbType.AnsiString: return "SqlDbType.VarChar";
+			case DbType.AnsiStringFixedLength: return "SqlDbType.VarChar";
+			case DbType.Binary: return "SqlDbType.Binary";
+			case DbType.Boolean: return "SqlDbType.Bit";
+			case DbType.Byte: return "SqlDbType.TinyInt";
+			case DbType.Currency: return "SqlDbType.Money";
+			case DbType.Date: return "SqlDbType.SmallDateTime";
+			case DbType.DateTime: return "SqlDbType.DateTime";
+			case DbType.Decimal: return "SqlDbType.Decimal";
+			case DbType.Double: return "SqlDbType.Float";
+			case DbType.Guid: return "SqlDbType.UniqueIdentifier";
+			case DbType.Int16: return "SqlDbType.SmallInt";
+			case DbType.Int32: return "SqlDbType.Int";
+			case DbType.Int64: return "SqlDbType.BigInt";
+			case DbType.Object: return "SqlDbType.Variant";
+			case DbType.SByte: return "SqlDbType.TinyInt";
+			case DbType.Single: return "SqlDbType.Real";
+			case DbType.String: return "SqlDbType.VarChar";
+			case DbType.StringFixedLength: return "SqlDbType.VarChar";
+			case DbType.Time: return "TimeSpan";
+			case DbType.UInt16: return "SqlDbType.SmallInt";
+			case DbType.UInt32: return "SqlDbType.Int";
+			case DbType.UInt64: return "SqlDbType.BigInt";
+			case DbType.VarNumeric: return "SqlDbType.Decimal";
+			default:
+				return "__UNKNOWN__" + column.NativeType;
+		}
+	}
+	//文件保存名称
+	public override string GetFileName()
+	{
+		return GetClassName(SourceTable) + ".cs";
+	}
+</script>
