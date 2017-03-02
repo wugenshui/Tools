@@ -4,13 +4,15 @@ Name: Model
 Author: 陈博
 Description: 2017-02-08  Version 1.0
 --%>
+<%-- 加载访问数据库的组件SchemaExplorer,并声明其使用的命名空间 --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="" %>
 <%@ Property Name="Namespace" Type="System.String" Default="HuaweiSoftware.EMMS_JCW.SDMSEntity" Optional="False" Category="基本设置" Description="命名空间" %>
 <%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="参数设置" Description="数据表" %>
-<%@ Assembly Name="System.Data" %>
-<%@ Import Namespace="System.Data" %>
-<%@ Assembly Name="SchemaExplorer" %>
-<%@ Import Namespace="SchemaExplorer" %>
 //*******************************************
 //File   : <%=GetFileName()%>
 //Author : 陈博
@@ -21,7 +23,7 @@ using System.Collections.Generic;
 
 namespace <%=Namespace%>
 {
-	public partial class <%=GetClassName(SourceTable)%>Info
+	public partial class <%=GetClassName(SourceTable)%>
 	{
         #region 成员变量
             
@@ -65,7 +67,7 @@ namespace <%=Namespace%>
 	//获取类名
 	public string GetClassName(TableSchema table)
 	{
-		return ConvertToPascal(table.Name.Substring(table.Name.IndexOf("_")+1));
+		return ConvertToPascal(table.Name.Substring(table.Name.IndexOf("_")+1)+"Info").Replace("_","");
 	}
     //获取表名
 	public string GetTableName(TableSchema table)
