@@ -1,0 +1,61 @@
+﻿<%-- 
+作者:陈博
+版本:V1.0
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="实体层、DAL层、BLL层代码生成模板" ResponseEncoding="UTF-8"%>
+
+<%-- 注册数据表生成模板 --%>
+<%@ Register Name="ModelTemplate" Template="工具材料Model.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+
+<%-- 数据库 --%>
+<%@ Property Name="数据库" Type="SchemaExplorer.DatabaseSchema" DeepLoad="True" Optional="False" Category="必填项"%>
+
+<% GenerateEntityClasses();%>
+生成成功！
+实体层：<%= 输出路径 %>\Model
+<script runat="template">
+    /// <summary>
+    /// 遍历数据库所有的表，生成对应模板文件
+    /// </summary>   
+    private void GenerateEntityClasses()
+    {
+        ModelTemplate model = new ModelTemplate();
+        foreach(TableSchema table in 数据库.Tables)
+        {
+            //  生成实体层模板，输出文件
+            string FileDirectory = 输出路径 +"\\Model\\"+ GetModelPath(table);
+            model.SetProperty("数据表",table);
+            model.RenderToFile(FileDirectory,true);
+        }
+    }
+
+    #region 配置参数-解决方案输出路径
+
+    // 解决方案输出路径
+    private string Directory = String.Empty;
+
+    [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+    [Optional, NotChecked]
+    [DefaultValue("")]
+    [Category("必填项")]
+    public string 输出路径
+    { 
+        get
+        {
+            return Directory;
+        }
+        set
+        {
+            if (value.EndsWith("\\")) 
+                value = value.Substring(0, value.Length -1);
+                Directory = value;
+        } 
+    }
+    
+    public string GetModelPath(TableSchema table)
+    {
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "Info").Replace("_","") + ".cs";
+    }
+    
+    #endregion
+</script>
