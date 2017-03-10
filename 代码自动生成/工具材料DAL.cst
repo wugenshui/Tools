@@ -1,0 +1,123 @@
+﻿<%-- 
+作者: 陈博
+版本: V1.2
+--%>
+<%-- 访问数据库的组件 --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+
+<%-- 参数 --%>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
+
+<%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.EMMS_JCW.SDMSDAL" Category="基本设置" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+using System;
+using System.Data;
+using System.Data.SqlClient;
+
+using HuaweiSoftware.EMMS_JCW.Common;
+using HuaweiSoftware.EMMS_JCW.DALDatabase;
+using HuaweiSoftware.EMMS_JCW.SDMSEntity;
+using HuaweiSoftware.Common.DataAccess;
+using HuaweiSoftware.Common.Database;
+
+namespace <%=命名空间%>
+{
+	public partial class <%=GetClassName(数据表)%> : BaseDAL
+	{
+        public <%= GetClassName(数据表) %>()
+            : base(DatabaseHelper.GetConnectionString(), "<%= 数据表.Name %>")
+        {
+            base.KeyScopeType = ScopeTypes.Database;
+        }
+        
+        protected override object DataReaderToEntity(IDataReader dataReader)
+        {
+            <%= GetModelName(数据表) %> info = new <%= GetModelName(数据表) %>();
+        	<%
+        		foreach(ColumnSchema col in 数据表.Columns)
+                {
+            %>
+            info.<%= col.Name %> = <%= GetParseValue(col) %>;
+            <%         
+                }
+            %>
+            
+            return info;
+        }
+	}
+}
+<script runat="template">
+	// 获取类名
+	public string GetClassName(TableSchema table)
+	{
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "DAL").Replace("_","");
+	}
+    // 获取Model_Name
+    public string GetModelName(TableSchema table)
+	{
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "Info").Replace("_","");
+	}
+    public override string GetFileName() 
+    {
+        return (数据表.Name.Substring(数据表.Name.IndexOf("_") + 1) + "DAL").Replace("_","") + ".cs";
+    }
+    
+    #region 获取列类型和默认值
+    /// <summary>
+    /// 获取C#数据类型默认值
+    /// </summary>
+    /// <param name="column">ColumnSchema:列对象，列数据类型</param>
+    /// <returns>C#数据类型默认值</returns>
+	public string GetParseValue(ColumnSchema col)
+	{
+		switch (col.DataType)
+		{
+			case DbType.AnsiString:
+			case DbType.AnsiStringFixedLength:
+            case DbType.String:
+			case DbType.StringFixedLength:
+                return "dataReader[\"" + col.Name + "\"].ToString()";
+			case DbType.Boolean: 
+                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"])";
+			case DbType.Byte: 
+                return "Convert.ToByte(dataReader[\"" + col.Name + "\"])";
+			case DbType.Date: 
+			case DbType.DateTime:
+            case DbType.DateTime2:
+            case DbType.Time:
+                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"])";
+            case DbType.Currency:
+			case DbType.Decimal:
+			case DbType.Double: 
+			case DbType.Int32:
+            case DbType.UInt32:
+            case DbType.VarNumeric:
+                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"])";
+            case DbType.UInt16:
+            case DbType.Int16:
+                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"])";
+            case DbType.Int64:
+            case DbType.UInt64:
+                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"])";
+			case DbType.Guid: 
+                return "Guid.NewGuid()";
+			case DbType.Object: 
+                return "dataReader[\"" + col.Name + "\"]";
+			case DbType.SByte: 
+			case DbType.Single: 
+			case DbType.Binary: 
+			 
+                return "0";
+			 
+                return "0";
+			 
+                return "0";
+			default:
+				return "__UNKNOWN__" + col.NativeType;
+		}
+	}
+    #endregion
+</script>

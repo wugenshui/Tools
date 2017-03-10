@@ -8,7 +8,7 @@
 <%@ Register Name="ModelTemplate" Template="工具材料Model.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
 
 <%-- 数据库 --%>
-<%@ Property Name="数据库" Type="SchemaExplorer.DatabaseSchema" DeepLoad="True" Optional="False" Category="必填项"%>
+<%@ Property Name="数据库" Type="SchemaExplorer.DatabaseSchema" DeepLoad="True" Optional="False" Category="基本设置"%>
 
 <% GenerateEntityClasses();%>
 生成成功！
@@ -37,7 +37,7 @@
     [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
     [Optional, NotChecked]
     [DefaultValue("")]
-    [Category("必填项")]
+    [Category("基本设置")]
     public string 输出路径
     { 
         get
