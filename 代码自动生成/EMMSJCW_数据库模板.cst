@@ -6,26 +6,41 @@
 
 <%-- 注册数据表生成模板 --%>
 <%@ Register Name="ModelTemplate" Template="工具材料Model.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+<%@ Register Name="DALTemplate" Template="工具材料DAL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+<%@ Register Name="BLLTemplate" Template="工具材料BLL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
 
 <%-- 数据库 --%>
 <%@ Property Name="数据库" Type="SchemaExplorer.DatabaseSchema" DeepLoad="True" Optional="False" Category="基本设置"%>
 
-<% GenerateEntityClasses();%>
+<% GenerateFiles();%>
 生成成功！
 实体层：<%= 输出路径 %>\Model
+DAL层：<%= 输出路径 %>\DAL
+BLL层：<%= 输出路径 %>\BLL
 <script runat="template">
     /// <summary>
     /// 遍历数据库所有的表，生成对应模板文件
     /// </summary>   
-    private void GenerateEntityClasses()
+    private void GenerateFiles()
     {
         ModelTemplate model = new ModelTemplate();
+        DALTemplate dal = new DALTemplate();
+        BLLTemplate bll = new BLLTemplate();
+        
         foreach(TableSchema table in 数据库.Tables)
         {
-            //  生成实体层模板，输出文件
-            string FileDirectory = 输出路径 +"\\Model\\"+ GetModelPath(table);
+            // 实体层
+            string modelPath = 输出路径 +"\\Model\\"+ GetParseName(table) + "Info.cs";
             model.SetProperty("数据表",table);
-            model.RenderToFile(FileDirectory,true);
+            model.RenderToFile(modelPath,true);
+            // DAL
+            string dalPath = 输出路径 +"\\DAL\\"+ GetParseName(table) + "DAL.cs";
+            dal.SetProperty("数据表",table);
+            dal.RenderToFile(dalPath,true);
+            // BLL
+            string bllPath = 输出路径 +"\\BLL\\"+ GetParseName(table) + "BLL.cs";
+            bll.SetProperty("数据表",table);
+            bll.RenderToFile(bllPath,true);
         }
     }
 
@@ -52,9 +67,9 @@
         } 
     }
     
-    public string GetModelPath(TableSchema table)
+    public string GetParseName(TableSchema table)
     {
-		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "Info").Replace("_","") + ".cs";
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","");
     }
     
     #endregion

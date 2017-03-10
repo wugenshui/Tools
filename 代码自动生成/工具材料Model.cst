@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetClassName(数据表)%>
+	public partial class <%=GetModel(数据表)%>
 	{
         #region 成员变量
             
@@ -64,14 +64,14 @@ namespace <%=命名空间%>
 }
 <script runat="template">
 	//获取类名
-	public string GetClassName(TableSchema table)
+	public string GetModel(TableSchema table)
 	{
-		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "Info").Replace("_","");
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","") + "Info";
 	}
     
     public override string GetFileName() 
     {
-        return (数据表.Name.Substring(数据表.Name.IndexOf("_") + 1) + "Info").Replace("_","") + ".cs";
+        return GetModel(数据表) + ".cs";
     }
     
     #region 获取列类型和默认值
@@ -80,14 +80,14 @@ namespace <%=命名空间%>
 	/// </summary>
 	/// <param name="column">ColumnSchema:列对象，列数据类型</param>
 	/// <returns>C#数据类型</returns>
-	public string GetDataType(ColumnSchema column)
+	public string GetDataType(ColumnSchema col)
 	{
         string nullString = "";     // 可空数据类型标志
-        if(column.AllowDBNull && 是否包含可空标志) 
+        if(col.AllowDBNull && 是否包含可空标志) 
         {
             nullString = "?";
         }
-		switch (column.DataType)
+		switch (col.DataType)
 		{
 			case DbType.AnsiString: return "string";
 			case DbType.AnsiStringFixedLength: return "string";
@@ -114,7 +114,7 @@ namespace <%=命名空间%>
 			case DbType.UInt32: return "uint" + nullString;
 			case DbType.UInt64: return "ulong" + nullString;
 			case DbType.VarNumeric: return "decimal" + nullString;
-			default: return "__UNKNOWN__" + column.NativeType;
+			default: return "__UNKNOWN__" + col.NativeType;
 		}
 	}
     
@@ -123,9 +123,9 @@ namespace <%=命名空间%>
     /// </summary>
     /// <param name="column">ColumnSchema:列对象，列数据类型</param>
     /// <returns>C#数据类型默认值</returns>
-	public string GetDefaultValue(ColumnSchema column)
+	public string GetDefaultValue(ColumnSchema col)
 	{
-		switch (column.DataType)
+		switch (col.DataType)
 		{
 			case DbType.AnsiString:
 			case DbType.AnsiStringFixedLength:
@@ -166,7 +166,7 @@ namespace <%=命名空间%>
 			case DbType.UInt64: 
                 return "0";
 			default:
-				return "__UNKNOWN__" + column.NativeType;
+				return "__UNKNOWN__" + col.NativeType;
 		}
 	}
     #endregion

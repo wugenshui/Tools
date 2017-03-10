@@ -25,17 +25,18 @@ using HuaweiSoftware.Common.Database;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetClassName(数据表)%> : BaseDAL
+	public partial class <%=GetDAL(数据表)%> : BaseDAL
 	{
-        public <%= GetClassName(数据表) %>()
+        public <%= GetDAL(数据表) %>()
             : base(DatabaseHelper.GetConnectionString(), "<%= 数据表.Name %>")
         {
             base.KeyScopeType = ScopeTypes.Database;
         }
         
+        // 本方法由CodeSmith工具自动生成
         protected override object DataReaderToEntity(IDataReader dataReader)
         {
-            <%= GetModelName(数据表) %> info = new <%= GetModelName(数据表) %>();
+            <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
         	<%
         		foreach(ColumnSchema col in 数据表.Columns)
                 {
@@ -50,19 +51,17 @@ namespace <%=命名空间%>
 	}
 }
 <script runat="template">
-	// 获取类名
-	public string GetClassName(TableSchema table)
+	public string GetDAL(TableSchema table)
 	{
-		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "DAL").Replace("_","");
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1)).Replace("_","") + "DAL";
 	}
-    // 获取Model_Name
-    public string GetModelName(TableSchema table)
+    public string GetModel(TableSchema table)
 	{
-		return (table.Name.Substring(table.Name.IndexOf("_") + 1) + "Info").Replace("_","");
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1)).Replace("_","") + "Info";
 	}
-    public override string GetFileName() 
+    public override string GetFileName()
     {
-        return (数据表.Name.Substring(数据表.Name.IndexOf("_") + 1) + "DAL").Replace("_","") + ".cs";
+        return GetDAL(数据表) + ".cs";
     }
     
     #region 获取列类型和默认值
