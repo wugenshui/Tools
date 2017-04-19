@@ -47,7 +47,7 @@ namespace <%=命名空间%>
     
     <% if(!string.IsNullOrWhiteSpace(col.Description)) { %>
         /// <summary>
-        /// <%=col.Description %>
+        /// <%=col.Description.Replace("\r\n","").Replace("\n","") %>
         /// </summary>
     <% } %>
         public <%=GetDataType(col)%> <%=col.Name%> 
