@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>排序</title>
+</head>
+
+<body>
+  <script>
+    var showArray = true; // 是否显示数组
+    // 初始化数组
+    var data = [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+    for (var i = 0; i < 100; i++) {
+      data.push(Math.ceil(Math.random() * 1000));
+    }
+    showArray = false;
+
+    function bubbleSort() {
+      var array = data.slice(); // 删除数组中元素，返回一个新的数组，此处用作拷贝
+      console.time('冒泡排序耗时');
+      var temp;
+      for (var i = 0; i < array.length; i++) {
+        for (var j = 0; j < array.length - i - 1; j++) {
+          if (array[j] > array[j + 1]) {
+            // 替换元素
+            temp = array[j + 1];
+            array[j + 1] = array[j];
+            array[j] = temp;
+            // array[i] = array[i] + array[j];
+            // array[j] = array[i] - array[j];
+            // array[i] = array[i] - array[j];
+          }
+        }
+      }
+      console.timeEnd('冒泡排序耗时');
+      if (showArray) {
+        console.log(array + "\n\n");
+      }
+    }
+    function bubbleSort2() {
+      var array = data.slice();
+      console.time('冒泡排序改进版耗时');
+      var i = array.length - 1;  //初始时,最后位置保持不变
+      while (i > 0) {
+        var pos = 0;  // 每趟开始时,无记录交换
+        for (var j = 0; j < i; j++)
+          if (array[j] > array[j + 1]) {
+            pos = j;  // 记录交换的位置
+            var tmp = array[j];
+            array[j] = array[j + 1];
+            array[j + 1] = tmp;
+          }
+        i = pos;  // 为下一趟排序作准备
+      }
+      console.timeEnd('冒泡排序改进版耗时');
+      if (showArray) {
+        console.log(array + "\n\n");
+      }
+    }
+    function selectionSort() {
+      var array = data.slice();
+      console.time('选择排序耗时');
+      var minIndex, temp;
+      for (var i = 0; i < array.length - 1; i++) {
+        minIndex = i;
+        for (var j = i + 1; j < array.length; j++) {
+          if (array[minIndex] > array[j]) {
+            minIndex = j;
+          }
+        }
+        if (i != minIndex) {
+          temp = array[i];
+          array[i] = array[minIndex];
+          array[minIndex] = temp;
+        }
+      }
+      console.timeEnd('选择排序耗时');
+      if (showArray) {
+        console.log(array + "\n\n");
+      }
+    }
+    function insertionSort() {
+      var array = data.slice();
+      console.time('插入排序耗时');
+      var key, insertIndex, temp;
+      for (var i = 1; i < array.length; i++) {
+        key = array[i];
+        var j = i - 1;
+        while (j >= 0 && array[j] > key) {
+          array[j + 1] = array[j];
+          j--;
+        }
+        array[j + 1] = key;
+      }
+      console.timeEnd('插入排序耗时');
+      if (showArray) {
+        console.log(array + "\n\n");
+      }
+    }
+    function quickSort(data) {
+      var array = data.slice();
+
+      if (array.length <= 1) { return array; }
+      var pivotIndex = Math.floor(array.length / 2);
+      var pivot = array.splice(pivotIndex, 1)[0];
+      var left = [];
+      var right = [];
+      for (var i = 0; i < array.length; i++) {
+        if (array[i] < pivot) {
+          left.push(array[i]);
+        } else {
+          right.push(array[i]);
+        }
+      }
+      array = quickSort(left).concat([pivot], quickSort(right));
+
+      // if (showArray) {
+      //   console.log(array + "\n\n");
+      // }
+      return quickSort(left).concat([pivot], quickSort(right));
+    }
+
+
+    function sort() {
+      var array = data.slice();
+      console.time('sort耗时');
+      array = array.sort(function (a, b) {
+        return a - b;
+      });
+      console.timeEnd('sort耗时');
+      if (showArray) {
+        console.log(array + "\n\n");
+      }
+    }
+
+    // 调用方法
+    bubbleSort();
+    bubbleSort2();
+    selectionSort();
+    insertionSort();
+    console.time('快速排序耗时');
+    var quickData = quickSort(data);
+    console.timeEnd('快速排序耗时');
+    if (showArray) {
+      console.log(quickData + "\n\n");
+    }
+    sort();
+  </script>
+</body>
+
+</html>
