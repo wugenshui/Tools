@@ -71,7 +71,7 @@ namespace <%=命名空间%>
         #region 改
 
         /// <summary>
-        /// 删除表中一条数据
+        /// 更新表中一条数据
         /// </summary>
         /// <param name="obj">包含主键ID的实体</param>        
         /// <returns>语句影响的行数</returns>

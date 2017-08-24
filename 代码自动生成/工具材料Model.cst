@@ -32,7 +32,7 @@ namespace <%=命名空间%>
 		foreach(ColumnSchema col in 数据表.Columns)
         {
     %>
-        private <%=GetDataType(col)%> m_<%=col.Name%> = <%=GetDefaultValue(col) %>;
+        private <%=GetDataType(col) %> m_<%=col.Name%> = <%=GetDefaultValue(col) %>;
     <%         
         }
     %>
@@ -132,7 +132,10 @@ namespace <%=命名空间%>
             case DbType.String:
 			case DbType.StringFixedLength:
                 return "string.Empty";
-			case DbType.Boolean: 
+			case DbType.Boolean:
+                if(col.ExtendedProperties["CS_Default"].Value.ToString().ToLower().Contains("1")) {
+                    return "true";   
+                }
                 return "false";
 			case DbType.Byte: 
                 return "1";
