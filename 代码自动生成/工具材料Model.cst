@@ -1,8 +1,4 @@
-﻿<%-- 
-作者: 陈博
-版本: V1.2
---%>
-<%-- 访问数据库的组件 --%>
+﻿<%-- 访问数据库的组件 --%>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
@@ -15,7 +11,7 @@
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
 //*******************************************
-//Author : 陈博
+//Author : chenbo
 //DateTime : <%=DateTime.Now%>
 //Description : 本文件由CodeSmith工具自动生成
 //*******************************************

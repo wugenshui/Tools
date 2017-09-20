@@ -1,8 +1,4 @@
-﻿<%-- 
-作者: 陈博
-版本: V1.2
---%>
-<%-- 访问数据库的组件 --%>
+﻿<%-- 访问数据库的组件 --%>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>

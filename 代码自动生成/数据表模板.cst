@@ -1,8 +1,4 @@
-﻿<%-- 
-作者:陈博
-版本:V1.0
---%>
-<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="实体层、DAL层、BLL层代码生成模板" ResponseEncoding="UTF-8"%>
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="实体层、DAL层、BLL层代码生成模板" ResponseEncoding="UTF-8"%>
 
 <%-- 注册数据表生成模板 --%>
 <%@ Register Name="ModelTemplate" Template="工具材料Model.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
