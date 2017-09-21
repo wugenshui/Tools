@@ -1,0 +1,119 @@
+﻿<%-- 访问数据库的组件 --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+
+<%-- 参数 --%>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
+
+<%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.BLL" Category="基本设置" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+using System.Data;
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+
+using HuaweiSoftware.GDZHXT.DAL;
+using HuaweiSoftware.GDZHXT.Entity;
+
+namespace <%=命名空间%>
+{
+	public partial class <%=GetBLL(数据表)%>
+	{
+        private <%= GetDAL(数据表) %> m_<%= GetDAL(数据表) %> = new <%= GetDAL(数据表) %>();
+        
+        /// <summary>
+        /// 插入实体到数据库
+        /// </summary>
+        /// <param name="model">实体类</param>
+        /// <returns>插入实体的ID</returns>
+        public int Insert(<%= GetModel(数据表) %> model)
+        {
+            return m_<%= GetDAL(数据表) %>.Insert(model);
+        }
+
+        /// <summary>
+        /// 删除表中一条数据
+        /// </summary>
+        /// <param name="id">主键ID</param>        
+        /// <returns>语句影响的行数</returns>
+        public int Delete(object id)
+        {
+            return m_<%= GetDAL(数据表) %>.Delete(id);
+        }
+
+        /// <summary>
+        /// 删除表中指定条件下数据,需要根据实际情况调整
+        /// </summary>
+        /// <param name="filter">查询条件</param>
+        /// <param name="param">参数化</param>
+        /// <returns>语句影响的行数</returns>
+        public int Delete(string filter, IDataParameter[] param)
+        {
+            return m_<%= GetDAL(数据表) %>.Delete(filter, param);
+        }
+
+        /// <summary>
+        /// 更新表中一条数据
+        /// </summary>
+        /// <param name="obj">包含主键ID的实体</param>        
+        /// <returns>语句影响的行数</returns>
+        public int Update(object obj)
+        {
+            return m_<%= GetDAL(数据表) %>.Update(obj);
+        }
+
+        /// <summary>
+        /// 更新表中指定属性的值,需要根据实际情况调整
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <param name="fieldName">列名</param>
+        /// <param name="fieldValue">列值</param>
+        /// <returns>语句影响的行数</returns>
+        public int Update(object id, string fieldName, string fieldValue)
+        {
+            return m_<%= GetDAL(数据表) %>.Update(id, fieldName, fieldValue);
+        }
+
+        /// <summary>
+        /// 根据ID查询实体
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns>实体</returns>
+        public <%= GetModel(数据表) %> FindByKey(object id)
+        {
+            return m_<%= GetDAL(数据表) %>.FindByKey(id) as <%= GetModel(数据表) %>;
+        }
+
+        /// <summary>
+        /// 根据指定条件查询实体集合,需要根据实际情况调整
+        /// </summary>
+        /// <param name="filter">查询条件,若查询所有可写为“1=1”</param>
+        /// <param name="param">参数化</param>
+        /// <returns>指定条件下实体集合</returns>
+        public List<<%= GetModel(数据表) %>> Find(string filter, IDataParameter[] param = null)
+        {
+            return m_<%= GetDAL(数据表) %>.Find(filter, param).Cast<<%= GetModel(数据表) %>>().ToList();
+        }
+	}
+}
+<script runat="template">
+    public string GetModel(TableSchema table)
+	{
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","") + "Info";
+	}
+    public string GetDAL(TableSchema table)
+	{
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","") + "DAL";
+	}
+    public string GetBLL(TableSchema table)
+	{
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","") + "BLL";
+	}
+    public override string GetFileName()
+    {
+        return GetBLL(数据表) + ".cs";
+    }
+</script>
