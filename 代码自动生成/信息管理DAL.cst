@@ -13,7 +13,9 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 
+using HuaweiSoftware.Common.DataAccess;
 using HuaweiSoftware.Common.Database;
+using HuaweiSoftware.GDZHXT.Common;
 using HuaweiSoftware.GDZHXT.Entity;
 
 namespace <%=命名空间%>
@@ -23,7 +25,7 @@ namespace <%=命名空间%>
         public <%= GetDAL(数据表) %>()
             : base(DatabaseHelper.GetConnectionString(), "<%= 数据表.Name %>")
         {
-            base.KeyScopeType = ScopeTypes.Database;
+            base.KeyScopeType = ScopeTypes.NoScope;
         }
         
         // 本方法由CodeSmith工具自动生成
@@ -73,39 +75,33 @@ namespace <%=命名空间%>
 			case DbType.StringFixedLength:
                 return "dataReader[\"" + col.Name + "\"].ToString()";
 			case DbType.Boolean: 
-                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"])";
-			case DbType.Byte: 
-                return "Convert.ToByte(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"] == DBNull.Value ? null : dataReader[\"" + col.Name + "\"])";
 			case DbType.Date: 
 			case DbType.DateTime:
             case DbType.DateTime2:
             case DbType.Time:
-                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"] == DBNull.Value ? null : dataReader[\"" + col.Name + "\"])";
             case DbType.Currency:
 			case DbType.Decimal:
 			case DbType.Double: 
 			case DbType.Int32:
             case DbType.UInt32:
             case DbType.VarNumeric:
-                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"])";
+            case DbType.Byte: 
+                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"] == DBNull.Value ? null : dataReader[\"" + col.Name + "\"])";
             case DbType.UInt16:
             case DbType.Int16:
-                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"] == DBNull.Value ? null : dataReader[\"" + col.Name + "\"])";
             case DbType.Int64:
             case DbType.UInt64:
-                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"] == DBNull.Value ? null : dataReader[\"" + col.Name + "\"])";
 			case DbType.Guid: 
                 return "Guid.NewGuid()";
 			case DbType.Object: 
-                return "dataReader[\"" + col.Name + "\"]";
+                return "dataReader[\"" + col.Name + "\"].ToString()";
 			case DbType.SByte: 
 			case DbType.Single: 
 			case DbType.Binary: 
-			 
-                return "0";
-			 
-                return "0";
-			 
                 return "0";
 			default:
 				return "__UNKNOWN__" + col.NativeType;

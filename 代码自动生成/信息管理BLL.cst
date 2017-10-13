@@ -9,12 +9,14 @@
 
 <%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.BLL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
-using System.Data;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
 
+using HuaweiSoftware.GDZHXT.Common;
 using HuaweiSoftware.GDZHXT.DAL;
 using HuaweiSoftware.GDZHXT.Entity;
 
@@ -29,9 +31,11 @@ namespace <%=命名空间%>
         /// </summary>
         /// <param name="model">实体类</param>
         /// <returns>插入实体的ID</returns>
-        public int Insert(<%= GetModel(数据表) %> model)
+        public string Insert(<%= GetModel(数据表) %> model)
         {
-            return m_<%= GetDAL(数据表) %>.Insert(model);
+            model.ID = CommonHelper.GetGuid();
+            m_<%= GetDAL(数据表) %>.Insert(model);
+            return model.ID;
         }
 
         /// <summary>
@@ -60,21 +64,9 @@ namespace <%=命名空间%>
         /// </summary>
         /// <param name="obj">包含主键ID的实体</param>        
         /// <returns>语句影响的行数</returns>
-        public int Update(object obj)
+        public int Update(<%= GetModel(数据表) %> obj)
         {
             return m_<%= GetDAL(数据表) %>.Update(obj);
-        }
-
-        /// <summary>
-        /// 更新表中指定属性的值,需要根据实际情况调整
-        /// </summary>
-        /// <param name="id">主键ID</param>
-        /// <param name="fieldName">列名</param>
-        /// <param name="fieldValue">列值</param>
-        /// <returns>语句影响的行数</returns>
-        public int Update(object id, string fieldName, string fieldValue)
-        {
-            return m_<%= GetDAL(数据表) %>.Update(id, fieldName, fieldValue);
         }
 
         /// <summary>
