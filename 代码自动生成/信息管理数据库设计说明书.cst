@@ -1,0 +1,90 @@
+﻿<%-- 访问数据库的组件 --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+
+<%-- 参数 --%>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="c#" Src="" Debug="False" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Default="" Category="基本设置" %>
+<table borderColor='black' border='1'>
+	<% foreach(TableSchema table in 数据表) { %>
+            <tr><th colspan="8">_____<%= table.Name %>_____</th></tr>
+        <% bool isFirst = true;
+        foreach(ColumnSchema col in table.Columns) { %>
+            <tr>
+                <td><%= col.Name %></td>
+                <td><%=GetDescription(col)%></td>
+                <td><%=isFirst ? "√" : ""%></td>
+                <td><%=isFirst ? "√" : ""%></td><% if(isFirst) { isFirst = false;} %>
+                <td><%=GetDataType(col)%></td>
+                <td><%=( col.DataType == DbType.String ? "" + col.Size / 2 : ""  )%></td>
+                <td></td>
+                <td><%=col.ExtendedProperties["CS_Default"].Value.ToString().ToLower()%></td>
+            </tr>
+    <% } }%>  
+</table>
+<script runat="template">
+
+    public string GetDescription(ColumnSchema col){
+        string result = string.Empty;
+        result = col.Description.Replace("\r\n","").Replace("\n","").Replace(" = ","=").Replace("= ","=").Replace(" =","=");
+        if(result.ToLower() == "id") {
+            result = "";
+        }
+        
+        return result;
+    }
+    
+	/// <summary>
+	/// 获取C#数据类型
+	/// </summary>
+	/// <param name="column">ColumnSchema:列对象，列数据类型</param>
+	/// <returns>C#数据类型</returns>
+	public string GetDataType(ColumnSchema col)
+	{
+        string nullString = "";     // 可空数据类型标志
+        if(col.AllowDBNull) 
+        {
+            nullString = "";
+        }
+		switch (col.DataType)
+		{
+            case DbType.Object:
+            case DbType.String:
+            case DbType.AnsiString:
+            case DbType.AnsiStringFixedLength:
+                return "VARCHAR2";
+            case DbType.Date:
+			case DbType.DateTime:
+			case DbType.DateTime2: 
+                return "DATE";
+            case DbType.Byte: 
+            case DbType.Int32:
+                return "NUMBER";
+                
+                
+			case DbType.Binary: return "byte[]";
+			case DbType.Boolean: return "bool";
+			case DbType.Currency: return "decimal";
+			case DbType.Decimal: return "decimal" + nullString;
+			case DbType.Double: return "double" + nullString;
+			case DbType.Guid: return "Guid" + nullString;
+			case DbType.Int16: return "short" + nullString;
+			
+			case DbType.Int64: return "long" + nullString;
+			case DbType.SByte: return "sbyte" + nullString;
+			case DbType.Single: return "float" + nullString;
+			case DbType.StringFixedLength: return "string";
+			case DbType.Time: return "TimeSpan" + nullString;
+			case DbType.UInt16: return "ushort" + nullString;
+			case DbType.UInt32: return "uint" + nullString;
+			case DbType.UInt64: return "ulong" + nullString;
+			case DbType.VarNumeric: return "decimal" + nullString;
+			default: return "__UNKNOWN__" + col.NativeType;
+		}
+	}
+    
+</script>
+</script>
