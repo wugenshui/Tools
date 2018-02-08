@@ -1,9 +1,8 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="实体层、DAL层、BLL层代码生成模板" ResponseEncoding="UTF-8"%>
 
 <%-- 注册数据表生成模板 --%>
-<%@ Register Name="ModelTemplate" Template="工具材料Model.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
-<%@ Register Name="DALTemplate" Template="工具材料DAL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
-<%@ Register Name="BLLTemplate" Template="工具材料BLL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+<%@ Register Name="ModelTemplate" Template="GMSModel.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+<%@ Register Name="DALTemplate" Template="GMSDAL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
 
 <%-- 数据库 --%>
 <%@ Property Name="数据库" Type="SchemaExplorer.TableSchemaCollection" DeepLoad="True" Optional="False" Category="基本设置"%>
@@ -18,7 +17,6 @@
     {
         ModelTemplate model = new ModelTemplate();
         DALTemplate dal = new DALTemplate();
-        BLLTemplate bll = new BLLTemplate();
         
         if(数据库.Count > 3) 
         {
@@ -32,10 +30,6 @@
                 string dalPath = 输出路径 +"\\DAL\\"+ GetParseName(table) + "DAL.cs";
                 dal.SetProperty("数据表",table);
                 dal.RenderToFile(dalPath,true);
-                // BLL
-                string bllPath = 输出路径 +"\\BLL\\"+ GetParseName(table) + "BLL.cs";
-                bll.SetProperty("数据表",table);
-                bll.RenderToFile(bllPath,true);
             }
         }
         else
@@ -50,10 +44,6 @@
                 string dalPath = 输出路径 +"\\"+ GetParseName(table) + "DAL.cs";
                 dal.SetProperty("数据表",table);
                 dal.RenderToFile(dalPath,true);
-                // BLL
-                string bllPath = 输出路径 +"\\"+ GetParseName(table) + "BLL.cs";
-                bll.SetProperty("数据表",table);
-                bll.RenderToFile(bllPath,true);
             }
         }
     }

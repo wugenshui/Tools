@@ -7,7 +7,7 @@
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
 
-<%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.Entity" Category="基本设置" %>
+<%@ Property Name="命名空间" Type="String" Default="GMSWebApi.Models" Category="基本设置" %>
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
 //*******************************************

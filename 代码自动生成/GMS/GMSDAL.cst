@@ -1,0 +1,152 @@
+﻿<%-- 访问数据库的组件 --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+
+<%-- 参数 --%>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
+
+<%@ Property Name="命名空间" Type="String" Default="GMSWebApi.DAL" Category="基本设置" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+using GMSWebApi.Common;
+using GMSWebApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+
+namespace <%=命名空间%>
+{
+	public class <%=GetDAL(数据表)%>
+	{
+        /// <summary>
+        /// 获取列表信息
+        /// </summary>
+        public DataTable Get()
+        {
+            SqlParameter[] param = new SqlParameter[]
+            {
+            };
+            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
+                            FROM <%=数据表.Name%>";
+            return SqlHelper.ExecuteDataset(sql, CommandType.Text, param).Tables[0];
+        }
+        
+        /// <summary>
+        /// 插入实体
+        /// </summary>
+        /// <param name="model">数据实体</param>
+        /// <returns></returns>
+        public int Insert(WorkOrderPointsInfo model)
+        {
+            string sql = @"INSERT INTO <%=数据表.Name%>
+                            (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
+                            VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
+            SqlParameter[] param = new SqlParameter[]
+            {
+                <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%><%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
+            };
+            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+        }
+        
+        /// <summary>
+        /// 更新实体
+        /// </summary>
+        /// <param name="model">数据实体</param>
+        /// <returns></returns>
+        public int Update(WorkOrderPointsInfo model)
+        {
+            string sql = @"UPDATE <%=数据表.Name%>
+                            SET <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% }%><% } %>
+                            WHERE ID=@ID";
+            SqlParameter[] param = new SqlParameter[]
+            {
+                <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
+            };
+            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+        }
+        
+        /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        public int Delete(int id)
+        {
+            string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@id";
+            SqlParameter[] param = new SqlParameter[]
+            {
+                new SqlParameter("id",id),
+            };
+            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+        }
+	}
+}
+<script runat="template">
+	public string GetDAL(TableSchema table)
+	{
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1)).Replace("_","") + "DAL";
+	}
+    public string GetModel(TableSchema table)
+	{
+		return (table.Name.Substring(table.Name.IndexOf("_") + 1)).Replace("_","") + "Info";
+	}
+    public override string GetFileName()
+    {
+        return GetDAL(数据表) + ".cs";
+    }
+    
+    #region 获取列类型和默认值
+    /// <summary>
+    /// 获取C#数据类型默认值
+    /// </summary>
+    /// <param name="column">ColumnSchema:列对象，列数据类型</param>
+    /// <returns>C#数据类型默认值</returns>
+	public string GetParseValue(ColumnSchema col)
+	{
+		switch (col.DataType)
+		{
+			case DbType.AnsiString:
+			case DbType.AnsiStringFixedLength:
+            case DbType.String:
+			case DbType.StringFixedLength:
+                return "dataReader[\"" + col.Name + "\"].ToString()";
+			case DbType.Boolean: 
+                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"])";
+			case DbType.Byte: 
+                return "Convert.ToByte(dataReader[\"" + col.Name + "\"])";
+			case DbType.Date: 
+			case DbType.DateTime:
+            case DbType.DateTime2:
+            case DbType.Time:
+                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"])";
+            case DbType.Currency:
+			case DbType.Decimal:
+			case DbType.Double: 
+			case DbType.Int32:
+            case DbType.UInt32:
+            case DbType.VarNumeric:
+                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"])";
+            case DbType.UInt16:
+            case DbType.Int16:
+                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"])";
+            case DbType.Int64:
+            case DbType.UInt64:
+                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"])";
+			case DbType.Guid: 
+                return "Guid.NewGuid()";
+			case DbType.Object: 
+                return "dataReader[\"" + col.Name + "\"]";
+			case DbType.SByte: 
+			case DbType.Single: 
+			case DbType.Binary: 
+                return "0";
+			default:
+				return "__UNKNOWN__" + col.NativeType;
+		}
+	}
+    #endregion
+</script>
