@@ -3,13 +3,19 @@
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
 <%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="c#" Src="" Debug="False" %>
 <%@ Assembly Name="CodeSmith.BaseTemplates" %>
-<%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Default="" Category="基本设置" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Inherits="OutputFileCodeTemplate" Default="" Category="基本设置" %>
+
 <table borderColor='black' border='1'>
 	<% foreach(TableSchema table in 数据表) { %>
-            <tr><th colspan="8">_____<%= table.Name %>_____</th></tr>
+            <tr><th colspan="8" style="font-size:20px;"><%= table.Name %></th></tr>
         <% bool isFirst = true;
         foreach(ColumnSchema col in table.Columns) { %>
             <tr>
@@ -22,10 +28,14 @@
                 <td></td>
                 <td><%=col.ExtendedProperties["CS_Default"].Value.ToString().Replace("((","").Replace("))","").ToLower()%></td>
             </tr>
-    <% } }%>  
+    <% } }%>
 </table>
 <script runat="template">
-
+    public override string GetFileName()
+    {
+        return "数据库文档.xls";
+    }
+    
     public string GetDescription(ColumnSchema col){
         string result = string.Empty;
         result = col.Description.Replace("\r\n","").Replace("\n","").Replace(" = ","=").Replace("= ","=").Replace(" =","=");
@@ -84,5 +94,24 @@
 		}
 	}
     
-</script>
+        // 解决方案输出路径
+    private string Directory = String.Empty;
+
+    [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+    [Optional, NotChecked]
+    [DefaultValue("")]
+    [Category("基本设置")]
+    public string 输出路径
+    { 
+        get
+        {
+            return Directory;
+        }
+        set
+        {
+            if (value.EndsWith("\\")) 
+                value = value.Substring(0, value.Length -1);
+                Directory = value;
+        } 
+    }
 </script>
