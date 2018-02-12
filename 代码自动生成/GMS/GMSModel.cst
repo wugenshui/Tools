@@ -7,7 +7,7 @@
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
 
-<%@ Property Name="命名空间" Type="String" Default="GMSWebApi.Models" Category="基本设置" %>
+<%@ Property Name="命名空间" Type="String" Default="GMSWebApi.Model" Category="基本设置" %>
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
 //*******************************************
@@ -20,14 +20,14 @@ using System.Collections.Generic;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetModel(数据表)%>
-	{       
+    public partial class <%=GetModel(数据表)%>
+    {
     <%
 		foreach(ColumnSchema col in 数据表.Columns)
         {
     %>
     <% if(!string.IsNullOrWhiteSpace(col.Description)) { %>
-    
+
         /// <summary>
         /// <%=col.Description.Replace("\r\n","").Replace("\n","") %>
         /// </summary>
@@ -36,7 +36,7 @@ namespace <%=命名空间%>
     <%         
         }
     %>
-	}
+    }
 }
 <script runat="template">
 	//获取类名

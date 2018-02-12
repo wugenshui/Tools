@@ -10,7 +10,7 @@
 <%@ Property Name="命名空间" Type="String" Default="GMSWebApi.DAL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
 using GMSWebApi.Common;
-using GMSWebApi.Models;
+using GMSWebApi.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -40,14 +40,14 @@ namespace <%=命名空间%>
         /// </summary>
         /// <param name="model">数据实体</param>
         /// <returns></returns>
-        public int Insert(WorkOrderPointsInfo model)
+        public int Insert(<%= GetModel(数据表) %> model)
         {
             string sql = @"INSERT INTO <%=数据表.Name%>
                             (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
                             VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
             SqlParameter[] param = new SqlParameter[]
             {
-                <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%><%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
+                <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
             };
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
@@ -57,7 +57,7 @@ namespace <%=命名空间%>
         /// </summary>
         /// <param name="model">数据实体</param>
         /// <returns></returns>
-        public int Update(WorkOrderPointsInfo model)
+        public int Update(<%= GetModel(数据表) %> model)
         {
             string sql = @"UPDATE <%=数据表.Name%>
                             SET <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% }%><% } %>
