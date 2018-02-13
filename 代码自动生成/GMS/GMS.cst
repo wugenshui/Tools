@@ -47,12 +47,16 @@
             }
         }
     }
-
+    
+    public string GetParseName(TableSchema table)
+    {
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","");
+    }
+    
     // 文件输出路径
     private string _Directory = String.Empty;
     [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
     [Optional, NotChecked]
-    [DefaultValue("")]
     [Category("基本设置")]
     public string 输出路径
     { 
@@ -67,11 +71,6 @@
             if (value.EndsWith("\\")) 
                 value = value.Substring(0, value.Length -1);
                 _Directory = value;
-        } 
-    }
-    
-    public string GetParseName(TableSchema table)
-    {
-		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","");
+        }
     }
 </script>
