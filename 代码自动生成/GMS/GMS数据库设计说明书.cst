@@ -1,4 +1,5 @@
-﻿<%-- 访问数据库的组件 --%>
+﻿<%@ CodeTemplate Language="C#" Inherits="CodeSmith.BaseTemplates.SqlCodeTemplate" TargetLanguage="C#" Description="生成文件模板" %>
+<%-- 访问数据库的组件 --%>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
@@ -7,10 +8,7 @@
 <%@ Import Namespace="CodeSmith.BaseTemplates" %>
 <%@ Assembly Name="CodeSmith.CustomProperties" %>
 <%@ Import Namespace="CodeSmith.CustomProperties" %>
-
 <%-- 参数 --%>
-<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="c#" Src="" Debug="False" %>
-<%@ Assembly Name="CodeSmith.BaseTemplates" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Inherits="OutputFileCodeTemplate" Default="" Category="基本设置" %>
 
 <table borderColor='black' border='1'>
@@ -93,25 +91,13 @@
 			default: return "__UNKNOWN__" + col.NativeType;
 		}
 	}
-    
-        // 解决方案输出路径
-    private string Directory = String.Empty;
 
-    [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
-    [Optional, NotChecked]
-    [DefaultValue("")]
+    // 文件输出路径
+    [FileDialog(FileDialogType.Save, Title="选择文件输出路径", Filter="Query Files (*.xls)|*.xls|All Files (*.*)|*.*", DefaultExtension=".xls")]
     [Category("基本设置")]
-    public string 输出路径
-    { 
-        get
-        {
-            return Directory;
-        }
-        set
-        {
-            if (value.EndsWith("\\")) 
-                value = value.Substring(0, value.Length -1);
-                Directory = value;
-        } 
+    public override string OutputFile
+    {
+        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\GMS数据库文档.xls";}
+        set {base.OutputFile = value;}
     }
 </script>
