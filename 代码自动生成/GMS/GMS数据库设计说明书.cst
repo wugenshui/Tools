@@ -26,7 +26,10 @@
                 <td></td>
                 <td><%=col.ExtendedProperties["CS_Default"].Value.ToString().Replace("((","").Replace("))","").ToLower()%></td>
             </tr>
-    <% } }%>
+    <% } %>
+            <tr><th colspan="8"><%= table.Columns.Count %>列</th></tr>
+            <tr><th colspan="8" style="height:50px;"></th></tr>
+    <% } %>
 </table>
 <script runat="template">
     public override string GetFileName()
