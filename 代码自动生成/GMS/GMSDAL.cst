@@ -23,18 +23,38 @@ namespace <%=命名空间%>
 	public class <%=GetDAL(数据表)%>
 	{
         /// <summary>
+        /// 数据是否存在
+        /// </summary>
+        /// <param name="id">主键</param>
+        /// <returns></returns>
+        public bool IsExist(object id)
+        {
+            int count = 0;
+            string sql = "SELECT count(*) FROM <%=数据表.Name%> WHERE ID=@id";
+            SqlParameter[] param = new SqlParameter[]
+            {
+                new SqlParameter("id",id),
+            };
+            object counter = SqlHelper.ExecuteScalar(sql, CommandType.Text, param);
+            int.TryParse(counter.ToString(), out count);
+            
+            return count > 0;
+        }
+
+        /// <summary>
         /// 获取列表信息
         /// </summary>
         public DataTable Get()
         {
+            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
+                            FROM <%=数据表.Name%>";
             SqlParameter[] param = new SqlParameter[]
             {
             };
-            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
-                            FROM <%=数据表.Name%>";
+
             return SqlHelper.ExecuteDataset(sql, CommandType.Text, param).Tables[0];
         }
-        
+
         /// <summary>
         /// 插入实体
         /// </summary>
@@ -49,6 +69,7 @@ namespace <%=命名空间%>
             {
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
             };
+            
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
         
@@ -66,6 +87,7 @@ namespace <%=命名空间%>
             {
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
             };
+            
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
         
@@ -74,13 +96,14 @@ namespace <%=命名空间%>
         /// </summary>
         /// <param name="id">主键ID</param>
         /// <returns></returns>
-        public int Delete(int id)
+        public int Delete(object id)
         {
             string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@id";
             SqlParameter[] param = new SqlParameter[]
             {
                 new SqlParameter("id",id),
             };
+            
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
 	}

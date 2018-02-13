@@ -48,11 +48,8 @@
         }
     }
 
-    #region 配置参数-解决方案输出路径
-
-    // 解决方案输出路径
-    private string Directory = String.Empty;
-
+    // 文件输出路径
+    private string _Directory = String.Empty;
     [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
     [Optional, NotChecked]
     [DefaultValue("")]
@@ -61,13 +58,15 @@
     { 
         get
         {
-            return Directory;
+            if (_Directory.Length == 0) 
+                _Directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            return _Directory;
         }
         set
         {
             if (value.EndsWith("\\")) 
                 value = value.Substring(0, value.Length -1);
-                Directory = value;
+                _Directory = value;
         } 
     }
     
@@ -75,6 +74,4 @@
     {
 		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","");
     }
-    
-    #endregion
 </script>
