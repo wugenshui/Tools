@@ -22,11 +22,8 @@ namespace <%=命名空间%>
 {
 	public class <%=GetDAL(数据表)%>
 	{
-        /// <summary>
-        /// 数据是否存在
-        /// </summary>
-        /// <param name="id">主键</param>
-        /// <returns></returns>
+        #region 一些基本操作,由代码生成工具生成
+    
         public bool IsExist(object id)
         {
             int count = 0;
@@ -41,9 +38,6 @@ namespace <%=命名空间%>
             return count > 0;
         }
 
-        /// <summary>
-        /// 获取列表信息
-        /// </summary>
         public DataTable Get()
         {
             string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
@@ -55,11 +49,6 @@ namespace <%=命名空间%>
             return SqlHelper.ExecuteDataset(sql, CommandType.Text, param).Tables[0];
         }
 
-        /// <summary>
-        /// 插入实体
-        /// </summary>
-        /// <param name="model">数据实体</param>
-        /// <returns></returns>
         public int Insert(<%= GetModel(数据表) %> model)
         {
             string sql = @"INSERT INTO <%=数据表.Name%>
@@ -73,11 +62,6 @@ namespace <%=命名空间%>
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
         
-        /// <summary>
-        /// 更新实体
-        /// </summary>
-        /// <param name="model">数据实体</param>
-        /// <returns></returns>
         public int Update(<%= GetModel(数据表) %> model)
         {
             string sql = @"UPDATE <%=数据表.Name%>
@@ -91,11 +75,6 @@ namespace <%=命名空间%>
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
         
-        /// <summary>
-        /// 删除实体
-        /// </summary>
-        /// <param name="id">主键ID</param>
-        /// <returns></returns>
         public int Delete(object id)
         {
             string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@id";
@@ -106,6 +85,8 @@ namespace <%=命名空间%>
             
             return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
         }
+        
+        #endregion
 	}
 }
 <script runat="template">
