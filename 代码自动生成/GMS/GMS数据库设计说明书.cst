@@ -11,6 +11,7 @@
 <%-- 参数 --%>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Inherits="OutputFileCodeTemplate" Default="" Category="基本设置" %>
 
+<meta charset="utf-8" />
 <table borderColor='black' border='1'>
 	<% foreach(TableSchema table in 数据表) { %>
             <tr><th colspan="8" style="font-size:20px;"><%= table.Name %></th></tr>
