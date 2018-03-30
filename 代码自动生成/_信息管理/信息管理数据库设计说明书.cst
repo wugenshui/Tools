@@ -1,16 +1,20 @@
-﻿<%-- 访问数据库的组件 --%>
+﻿<%@ CodeTemplate Language="C#" Inherits="CodeSmith.BaseTemplates.SqlCodeTemplate" TargetLanguage="C#" Description="生成文件模板" %>
+<%-- 访问数据库的组件 --%>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
 <%@ Import Namespace="System.Data" %>
-
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="c#" Src="" Debug="False" %>
 <%@ Assembly Name="CodeSmith.BaseTemplates" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Default="" Category="基本设置" %>
 <table borderColor='black' border='1'>
 	<% foreach(TableSchema table in 数据表) { %>
-            <tr><th colspan="8">_____<%= table.Name %>_____</th></tr>
+            <tr><th colspan="8" style="font-size:20px;"><%= table.Name %></th></tr>
         <% bool isFirst = true;
         foreach(ColumnSchema col in table.Columns) { %>
             <tr>
@@ -26,7 +30,11 @@
     <% } }%>  
 </table>
 <script runat="template">
-
+    public override string GetFileName()
+    {
+        return "数据库文档.xls";
+    }
+    
     public string GetDescription(ColumnSchema col){
         string result = string.Empty;
         result = col.Description.Replace("\r\n","").Replace("\n","").Replace(" = ","=").Replace("= ","=").Replace(" =","=");
@@ -86,5 +94,12 @@
 		}
 	}
     
-</script>
+    // 文件输出路径
+    [FileDialog(FileDialogType.Save, Title="选择文件输出路径", Filter="Query Files (*.xls)|*.xls|All Files (*.*)|*.*", DefaultExtension=".xls")]
+    [Category("基本设置")]
+    public override string OutputFile
+    {
+        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\GMS数据库文档.xls";}
+        set {base.OutputFile = value;}
+    }
 </script>
