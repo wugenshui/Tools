@@ -9,6 +9,10 @@
 
 <%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.BLL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+//***************************************************
+//Author : chenbo
+//Description : 本文件由CodeSmith工具自动生成,请勿修改
+//***************************************************
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,10 +26,10 @@ using HuaweiSoftware.GDZHXT.Entity;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetBLL(数据表)%>
-	{
+    public partial class <%=GetBLL(数据表)%>
+    {
         private <%= GetDAL(数据表) %> m_<%= GetDAL(数据表) %> = new <%= GetDAL(数据表) %>();
-        
+
         /// <summary>
         /// 插入实体到数据库
         /// </summary>
@@ -33,9 +37,13 @@ namespace <%=命名空间%>
         /// <returns>插入实体的ID</returns>
         public string Insert(<%= GetModel(数据表) %> model)
         {
+        <% if(数据表.Columns[0].Name == "ID") { %>
             model.ID = CommonHelper.GetGuid();
             m_<%= GetDAL(数据表) %>.Insert(model);
             return model.ID;
+        <% } else {%>
+            return m_<%= GetDAL(数据表) %>.Insert(model).ToString();
+        <% } %>
         }
 
         /// <summary>
@@ -89,7 +97,7 @@ namespace <%=命名空间%>
         {
             return m_<%= GetDAL(数据表) %>.Find(filter, param).Cast<<%= GetModel(数据表) %>>().ToList();
         }
-	}
+    }
 }
 <script runat="template">
     public string GetModel(TableSchema table)

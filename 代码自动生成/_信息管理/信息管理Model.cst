@@ -10,11 +10,10 @@
 <%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.Entity" Category="基本设置" %>
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
-//*******************************************
+//***************************************************
 //Author : chenbo
-//DateTime : <%=DateTime.Now%>
-//Description : 本文件由CodeSmith工具自动生成
-//*******************************************
+//Description : 本文件由CodeSmith工具自动生成,请勿修改
+//***************************************************
 using System;
 using System.Collections.Generic;
 
@@ -22,10 +21,10 @@ using HuaweiSoftware.GDZHXT.Common;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetModel(数据表)%>
-	{
+    public partial class <%=GetModel(数据表)%>
+    {
         #region 成员变量
-            
+
 	<%
 		foreach(ColumnSchema col in 数据表.Columns)
         {
@@ -34,21 +33,21 @@ namespace <%=命名空间%>
     <%         
         }
     %>
-    
+
         #endregion
-        
+
         #region 属性
     <%
 		foreach(ColumnSchema col in 数据表.Columns)
         {
     %>
-    
+
     <% if(!string.IsNullOrWhiteSpace(col.Description)) { %>
         /// <summary>
         /// <%=col.Description.Replace("\r\n","").Replace("\n","") %>
         /// </summary>
     <% } %>
-        public <%=GetDataType(col)%> <%=col.Name%> 
+        public <%=GetDataType(col)%> <%=col.Name%>
         {
             get { return m_<%=col.Name%>; }
             set { m_<%=col.Name%> = value; }
@@ -56,9 +55,9 @@ namespace <%=命名空间%>
     <%         
         }
     %>
-    
+
         #endregion
-	}
+    }
 }
 <script runat="template">
 	//获取类名

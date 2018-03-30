@@ -9,6 +9,10 @@
 
 <%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.GDZHXT.DAL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+//***************************************************
+//Author : chenbo
+//Description : 本文件由CodeSmith工具自动生成,请勿修改
+//***************************************************
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -20,15 +24,14 @@ using HuaweiSoftware.GDZHXT.Entity;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetDAL(数据表)%> : BaseDAL
-	{
+    public partial class <%=GetDAL(数据表)%> : BaseDAL
+    {
         public <%= GetDAL(数据表) %>()
             : base(DatabaseHelper.GetConnectionString(), "<%= 数据表.Name %>")
         {
             base.KeyScopeType = ScopeTypes.NoScope;
         }
-        
-        // 本方法由CodeSmith工具自动生成
+
         protected override object DataReaderToEntity(IDataReader dataReader)
         {
             <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
@@ -40,10 +43,10 @@ namespace <%=命名空间%>
             <%         
                 }
             %>
-            
+
             return info;
         }
-	}
+    }
 }
 <script runat="template">
 	public string GetDAL(TableSchema table)
