@@ -10,11 +10,10 @@
 <%@ Property Name="命名空间" Type="String" Default="GMSWebApi.Model" Category="基本设置" %>
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
-//*******************************************
+//***************************************************
 //Author : chenbo
-//DateTime : <%=DateTime.Now%>
-//Description : 本文件由CodeSmith工具自动生成
-//*******************************************
+//Description : 本文件由CodeSmith工具自动生成，请勿修改
+//***************************************************
 using System;
 using System.Collections.Generic;
 

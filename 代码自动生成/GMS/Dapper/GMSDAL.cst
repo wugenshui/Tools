@@ -9,6 +9,10 @@
 
 <%@ Property Name="命名空间" Type="String" Default="GMSWebApi.DAL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+//***************************************************
+//Author : chenbo
+//Description : 本文件由CodeSmith工具自动生成，请勿修改
+//***************************************************
 using Dapper;
 using GMSWebApi.Common;
 using GMSWebApi.Model;
@@ -23,15 +27,16 @@ namespace <%=命名空间%>
 {
     public partial class <%=GetDAL(数据表)%>
     {
-        IDbConnection db = DapperHelper.GetConnection();
-
         public bool IsExist(object id)
         {
-            int count = 0;
-            string sql = "SELECT count(*) FROM <%=数据表.Name%> WHERE ID=@ID";
-            object counter = db.ExecuteScalar(sql, new { ID = id });
-            int.TryParse(counter.ToString(), out count);
-            return count > 0;
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                int count = 0;
+                string sql = "SELECT count(*) FROM <%=数据表.Name%> WHERE ID=@ID";
+                object counter = db.ExecuteScalar(sql, new { ID = id });
+                int.TryParse(counter.ToString(), out count);
+                return count > 0;
+            }
         }
 
         /// <summary>
@@ -41,17 +46,23 @@ namespace <%=命名空间%>
         /// <returns>实体</returns>
         public <%=GetModel(数据表)%> GetByID(object id)
         {
-            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
                             FROM <%=数据表.Name%>
                             WHERE ID=@ID";
-            return db.Query<<%=GetModel(数据表)%>>(sql, new { ID = id }).ToList().FirstOrDefault();
+                return db.Query<<%=GetModel(数据表)%>>(sql, new { ID = id }).ToList().FirstOrDefault();
+            }
         }
 
         public List<<%=GetModel(数据表)%>> Get()
         {
-            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
                             FROM <%=数据表.Name%>";
-            return db.Query<<%=GetModel(数据表)%>>(sql).ToList();
+                return db.Query<<%=GetModel(数据表)%>>(sql).ToList();
+            }
         }
 
         /// <summary>
@@ -62,23 +73,26 @@ namespace <%=命名空间%>
         /// <returns>返回插入数据的ID</returns>
         public int Insert(<%=GetModel(数据表)%> param, IDbTransaction transaction = null)
         {
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
             <%if(((bool)数据表.Columns[0].ExtendedProperties["CS_IsIdentity"].Value) == true) { %>
-            int count = 0;
-            string sql = @"INSERT INTO <%=数据表.Name%>
+                int count = 0;
+                string sql = @"INSERT INTO <%=数据表.Name%>
                             (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
                             VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
                             SELECT SCOPE_IDENTITY();";
-            object counter = db.ExecuteScalar(sql, param, transaction);
-            int.TryParse(counter.ToString(), out count);
-            return count;
+                object counter = db.ExecuteScalar(sql, param, transaction);
+                int.TryParse(counter.ToString(), out count);
+                return count;
             <% } else { %>
-            string sql = @"INSERT INTO <%=数据表.Name%>
+                string sql = @"INSERT INTO <%=数据表.Name%>
                             (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
                             VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
                             SELECT SCOPE_IDENTITY();";
-            db.Execute(sql, param, transaction);
-            return param.ID;
+                db.Execute(sql, param, transaction);
+                return param.ID;
             <% } %>
+            }
         }
 
         /// <summary>
@@ -89,10 +103,13 @@ namespace <%=命名空间%>
         /// <returns>插入数据条数</returns>
         public int Insert(IEnumerable<<%=GetModel(数据表)%>> param, IDbTransaction transaction = null)
         {
-            string sql = @"INSERT INTO <%=数据表.Name%>
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = @"INSERT INTO <%=数据表.Name%>
                             (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
                             VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
-            return db.Execute(sql, param, transaction);
+                return db.Execute(sql, param, transaction);
+            }
         }
 
         /// <summary>
@@ -103,10 +120,13 @@ namespace <%=命名空间%>
         /// <returns>更新数据行数</returns>
         public int Update(<%= GetModel(数据表) %> param, IDbTransaction transaction = null)
         {
-            string sql = @"UPDATE <%=数据表.Name%>
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = @"UPDATE <%=数据表.Name%>
                             SET <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% }%><% } %>
                             WHERE ID=@ID";
-            return db.Execute(sql, param, transaction);
+                return db.Execute(sql, param, transaction);
+            }
         }
 
         /// <summary>
@@ -117,8 +137,11 @@ namespace <%=命名空间%>
         /// <returns>删除的行数</returns>
         public int Delete(object id, IDbTransaction transaction = null)
         {
-            string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@ID";
-            return db.Execute(sql, new { ID = id }, transaction);
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@ID";
+                return db.Execute(sql, new { ID = id }, transaction);
+            }
         }
 
         /// <summary>
@@ -129,8 +152,11 @@ namespace <%=命名空间%>
         /// <returns>删除的行数</returns>
         public int Delete(IEnumerable<int> ids, IDbTransaction transaction = null)
         {
-            string sql = "DELETE FROM <%=数据表.Name%> WHERE ID in @ID";
-            return db.Execute(sql, new { ID = ids }, transaction);
+            using (IDbConnection db = DapperHelper.GetConnection())
+            {
+                string sql = "DELETE FROM <%=数据表.Name%> WHERE ID in @ID";
+                return db.Execute(sql, new { ID = ids }, transaction);
+            }
         }
     }
 }

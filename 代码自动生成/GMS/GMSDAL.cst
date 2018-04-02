@@ -9,6 +9,10 @@
 
 <%@ Property Name="命名空间" Type="String" Default="GMSWebApi.DAL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+//***************************************************
+//Author : chenbo
+//Description : 本文件由CodeSmith工具自动生成，请勿修改
+//***************************************************
 using GMSWebApi.Common;
 using GMSWebApi.Model;
 using System;
@@ -20,10 +24,8 @@ using System.Web;
 
 namespace <%=命名空间%>
 {
-	public class <%=GetDAL(数据表)%>
+	public partial class <%=GetDAL(数据表)%>
 	{
-        #region 一些基本操作,由代码生成工具生成
-    
         public bool IsExist(object id)
         {
             int count = 0;
@@ -32,7 +34,7 @@ namespace <%=命名空间%>
             {
                 new SqlParameter("id",id),
             };
-            object counter = SqlHelper.ExecuteScalar(sql, CommandType.Text, param);
+            object counter = SqlHelper.ExecuteScalar(sql, param);
             int.TryParse(counter.ToString(), out count);
             
             return count > 0;
@@ -46,7 +48,7 @@ namespace <%=命名空间%>
             {
             };
 
-            return SqlHelper.ExecuteDataset(sql, CommandType.Text, param).Tables[0];
+            return SqlHelper.ExecuteDataset(sql, param).Tables[0];
         }
 
         public int Insert(<%= GetModel(数据表) %> model)
@@ -59,7 +61,7 @@ namespace <%=命名空间%>
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
             };
             
-            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+            return SqlHelper.ExecuteNonQuery(sql, param);
         }
         
         public int Update(<%= GetModel(数据表) %> model)
@@ -72,7 +74,7 @@ namespace <%=命名空间%>
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
             };
             
-            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+            return SqlHelper.ExecuteNonQuery(sql, param);
         }
         
         public int Delete(object id)
@@ -83,10 +85,8 @@ namespace <%=命名空间%>
                 new SqlParameter("id",id),
             };
             
-            return SqlHelper.ExecuteNonQuery(sql, CommandType.Text, param);
+            return SqlHelper.ExecuteNonQuery(sql, param);
         }
-        
-        #endregion
 	}
 }
 <script runat="template">
