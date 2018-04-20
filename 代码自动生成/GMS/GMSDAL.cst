@@ -24,8 +24,23 @@ using System.Web;
 
 namespace <%=命名空间%>
 {
-	public partial class <%=GetDAL(数据表)%>
-	{
+    public partial class <%= GetDAL(数据表) %>
+    {
+        private <%= GetModel(数据表) %> DataReaderToEntity(IDataReader dataReader)
+        {
+            <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
+        	<%
+        		foreach(ColumnSchema col in 数据表.Columns)
+                {
+            %>
+            info.<%= col.Name %> = <%= GetParseValue(col) %>;
+            <%         
+                }
+            %>
+
+            return info;
+        }
+
         public bool IsExist(object id)
         {
             int count = 0;
@@ -36,19 +51,52 @@ namespace <%=命名空间%>
             };
             object counter = SqlHelper.ExecuteScalar(sql, param);
             int.TryParse(counter.ToString(), out count);
-            
+
             return count > 0;
         }
 
-        public DataTable Get()
+        public <%= GetModel(数据表) %> FindByID(object id)
         {
+            <%= GetModel(数据表) %> result = null;
             string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
                             FROM <%=数据表.Name%>";
             SqlParameter[] param = new SqlParameter[]
             {
+                new SqlParameter("id",id),
             };
+            using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
+            {
+                if (reader.Read())
+                {
+                    result = DataReaderToEntity(reader);
+                }
+            }
 
-            return SqlHelper.ExecuteDataset(sql, param).Tables[0];
+            return result;
+        }
+
+        public List<<%= GetModel(数据表) %>> Find(string filterStr = null, SqlParameter[] param = null, string orderFields = null)
+        {
+            List<<%= GetModel(数据表) %>> result = new List<<%= GetModel(数据表) %>>();
+            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
+                            FROM <%=数据表.Name%>";
+            if (filterStr != null)
+            {
+                sql += "Where " + filterStr;
+            }
+            if (orderFields != null)
+            {
+                sql += " OrderBy " + orderFields;
+            }
+            using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
+            {
+                if (reader.Read())
+                {
+                    result.Add(DataReaderToEntity(reader));
+                }
+            }
+
+            return result;
         }
 
         public int Insert(<%= GetModel(数据表) %> model)
@@ -60,10 +108,10 @@ namespace <%=命名空间%>
             {
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
             };
-            
+
             return SqlHelper.ExecuteNonQuery(sql, param);
         }
-        
+
         public int Update(<%= GetModel(数据表) %> model)
         {
             string sql = @"UPDATE <%=数据表.Name%>
@@ -73,10 +121,10 @@ namespace <%=命名空间%>
             {
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
             };
-            
+
             return SqlHelper.ExecuteNonQuery(sql, param);
         }
-        
+
         public int Delete(object id)
         {
             string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@id";
@@ -84,10 +132,10 @@ namespace <%=命名空间%>
             {
                 new SqlParameter("id",id),
             };
-            
+
             return SqlHelper.ExecuteNonQuery(sql, param);
         }
-	}
+    }
 }
 <script runat="template">
 	public string GetDAL(TableSchema table)
