@@ -59,7 +59,8 @@ namespace <%=命名空间%>
         {
             <%= GetModel(数据表) %> result = null;
             string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
-                            FROM <%=数据表.Name%>";
+                            FROM <%=数据表.Name%>
+                            WHERE ID=@id";
             SqlParameter[] param = new SqlParameter[]
             {
                 new SqlParameter("id",id),
@@ -82,7 +83,7 @@ namespace <%=命名空间%>
                             FROM <%=数据表.Name%>";
             if (filterStr != null)
             {
-                sql += "Where " + filterStr;
+                sql += " Where " + filterStr;
             }
             if (orderFields != null)
             {
@@ -90,7 +91,7 @@ namespace <%=命名空间%>
             }
             using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
             {
-                if (reader.Read())
+                while (reader.Read())
                 {
                     result.Add(DataReaderToEntity(reader));
                 }
