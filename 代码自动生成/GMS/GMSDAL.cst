@@ -102,15 +102,30 @@ namespace <%=命名空间%>
 
         public int Insert(<%= GetModel(数据表) %> model)
         {
+        <%if(((bool)数据表.Columns[0].ExtendedProperties["CS_IsIdentity"].Value) == true) { %>
+            int count = 0;
             string sql = @"INSERT INTO <%=数据表.Name%>
-                            (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
-                            VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
+                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
+                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
+                        SELECT SCOPE_IDENTITY();";
             SqlParameter[] param = new SqlParameter[]
             {
                 <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
             };
-
-            return SqlHelper.ExecuteNonQuery(sql, param);
+            object counter = SqlHelper.ExecuteScalar(sql, param);
+            int.TryParse(counter.ToString(), out count);
+            return count;
+        <% } else { %>
+            string sql = @"INSERT INTO <%=数据表.Name%>
+                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
+                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
+            SqlParameter[] param = new SqlParameter[]
+            {
+                <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
+            };
+            SqlHelper.ExecuteNonQuery(sql, param);
+            return model.ID;
+        <% } %>
         }
 
         public int Update(<%= GetModel(数据表) %> model)
