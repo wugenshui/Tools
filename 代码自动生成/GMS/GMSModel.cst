@@ -21,20 +21,40 @@ namespace <%=命名空间%>
 {
     public partial class <%=GetModel(数据表)%>
     {
+        #region 成员变量
+
+	<%
+		foreach(ColumnSchema col in 数据表.Columns)
+        {
+    %>
+        private <%=GetDataType(col) %> m_<%=col.Name%> = <%=GetDefaultValue(col) %>;
+    <%         
+        }
+    %>
+
+        #endregion
+
+        #region 属性
     <%
 		foreach(ColumnSchema col in 数据表.Columns)
         {
     %>
-    <% if(!string.IsNullOrWhiteSpace(col.Description)) { %>
 
+    <% if(!string.IsNullOrWhiteSpace(col.Description)) { %>
         /// <summary>
         /// <%=col.Description.Replace("\r\n","").Replace("\n","") %>
         /// </summary>
     <% } %>
-        public <%=GetDataType(col)%> <%=col.Name%> { get; set; }
+        public <%=GetDataType(col)%> <%=col.Name%>
+        {
+            get { return m_<%=col.Name%>; }
+            set { m_<%=col.Name%> = value; }
+        }
     <%         
         }
     %>
+
+        #endregion
     }
 }
 <script runat="template">
@@ -48,7 +68,8 @@ namespace <%=命名空间%>
     {
         return GetModel(数据表) + ".cs";
     }
-
+    
+    #region 获取列类型和默认值
 	/// <summary>
 	/// 获取C#数据类型
 	/// </summary>
@@ -67,7 +88,7 @@ namespace <%=命名空间%>
 			case DbType.AnsiStringFixedLength: return "string";
 			case DbType.Binary: return "byte[]";
 			case DbType.Boolean: return "bool" + nullString;
-			case DbType.Byte: return "int" + nullString;
+			case DbType.Byte: return "byte" + nullString;
 			case DbType.Currency: return "decimal" + nullString;
 			case DbType.Date: return "DateTime" + nullString;
 			case DbType.DateTime: return "DateTime" + nullString;
@@ -78,7 +99,7 @@ namespace <%=命名空间%>
 			case DbType.Int16: return "short" + nullString;
 			case DbType.Int32: return "int" + nullString;
 			case DbType.Int64: return "long" + nullString;
-			case DbType.Object: return "string";
+			case DbType.Object: return "object";
 			case DbType.SByte: return "sbyte" + nullString;
 			case DbType.Single: return "float" + nullString;
 			case DbType.String: return "string";
@@ -91,4 +112,60 @@ namespace <%=命名空间%>
 			default: return "__UNKNOWN__" + col.NativeType;
 		}
 	}
+    
+    /// <summary>
+    /// 获取C#数据类型默认值
+    /// </summary>
+    /// <param name="column">ColumnSchema:列对象，列数据类型</param>
+    /// <returns>C#数据类型默认值</returns>
+	public string GetDefaultValue(ColumnSchema col)
+	{
+		switch (col.DataType)
+		{
+			case DbType.AnsiString:
+			case DbType.AnsiStringFixedLength:
+            case DbType.String:
+			case DbType.StringFixedLength:
+                return "string.Empty";
+			case DbType.Boolean:
+                if(col.ExtendedProperties["CS_Default"].Value.ToString().ToLower().Contains("1")) {
+                    return "true";   
+                }
+                return "false";
+			case DbType.Byte: 
+                return "1";
+			case DbType.Date: 
+			case DbType.DateTime:
+            case DbType.DateTime2:
+            case DbType.Time:
+                return "GMSCommon.CommonHelper.DefaultDateTime";
+            case DbType.Currency:
+			case DbType.Decimal:
+			case DbType.Double: 
+            case DbType.Int16:
+			case DbType.Int32:
+			case DbType.Int64:
+            case DbType.VarNumeric:
+                return "0";
+			case DbType.Guid: 
+                return "Guid.NewGuid()";
+			case DbType.Object: 
+                return "new object()";
+			case DbType.SByte: 
+                return "null";
+			case DbType.Single: 
+                return "0";
+			case DbType.Binary: 
+                return "null";
+			case DbType.UInt16: 
+                return "0";
+			case DbType.UInt32: 
+                return "0";
+			case DbType.UInt64: 
+                return "0";
+			default:
+				return "__UNKNOWN__" + col.NativeType;
+		}
+	}
+    #endregion
 </script>
