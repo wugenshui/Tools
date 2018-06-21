@@ -87,7 +87,7 @@ namespace <%=命名空间%>
             }
             if (orderFields != null)
             {
-                sql += " OrderBy " + orderFields;
+                sql += " Order By " + orderFields;
             }
             using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
             {
