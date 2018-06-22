@@ -26,7 +26,7 @@ namespace <%=命名空间%>
 {
     public partial class <%= GetDAL(数据表) %>
     {
-        private <%= GetModel(数据表) %> DataReaderToEntity(IDataReader dataReader)
+        private <%= GetModel(数据表) %> DataRowToEntity(DataRow row)
         {
             <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
         	<%
@@ -65,12 +65,10 @@ namespace <%=命名空间%>
             {
                 new SqlParameter("id",id),
             };
-            using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
+            DataTable table = SqlHelper.ExecuteDataset(sql, param).Tables[0];
+            if (table != null && table.Rows.Count > 0)
             {
-                if (reader.Read())
-                {
-                    result = DataReaderToEntity(reader);
-                }
+                result = DataRowToEntity(table.Rows[0]);
             }
 
             return result;
@@ -89,11 +87,12 @@ namespace <%=命名空间%>
             {
                 sql += " Order By " + orderFields;
             }
-            using (IDataReader reader = SqlHelper.ExecuteReader(sql, param))
+            DataTable table = SqlHelper.ExecuteDataset(sql, param).Tables[0];
+            if (table != null && table.Rows.Count > 0)
             {
-                while (reader.Read())
+                foreach (DataRow row in table.Rows)
                 {
-                    result.Add(DataReaderToEntity(reader));
+                    result.Add(DataRowToEntity(table.Rows[0]));
                 }
             }
 
@@ -181,33 +180,33 @@ namespace <%=命名空间%>
 			case DbType.AnsiStringFixedLength:
             case DbType.String:
 			case DbType.StringFixedLength:
-                return "dataReader[\"" + col.Name + "\"].ToString()";
+                return "row[\"" + col.Name + "\"].ToString()";
 			case DbType.Boolean: 
-                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToBoolean(row[\"" + col.Name + "\"])";
 			case DbType.Byte: 
-                return "Convert.ToByte(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToByte(row[\"" + col.Name + "\"])";
 			case DbType.Date: 
 			case DbType.DateTime:
             case DbType.DateTime2:
             case DbType.Time:
-                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToDateTime(row[\"" + col.Name + "\"])";
             case DbType.Currency:
 			case DbType.Decimal:
 			case DbType.Double: 
 			case DbType.Int32:
             case DbType.UInt32:
             case DbType.VarNumeric:
-                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToInt32(row[\"" + col.Name + "\"])";
             case DbType.UInt16:
             case DbType.Int16:
-                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToInt16(row[\"" + col.Name + "\"])";
             case DbType.Int64:
             case DbType.UInt64:
-                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"])";
+                return "Convert.ToInt64(row[\"" + col.Name + "\"])";
 			case DbType.Guid: 
                 return "Guid.NewGuid()";
 			case DbType.Object: 
-                return "dataReader[\"" + col.Name + "\"]";
+                return "row[\"" + col.Name + "\"]";
 			case DbType.SByte: 
 			case DbType.Single: 
 			case DbType.Binary: 
