@@ -92,7 +92,7 @@ namespace <%=命名空间%>
             {
                 foreach (DataRow row in table.Rows)
                 {
-                    result.Add(DataRowToEntity(table.Rows[0]));
+                    result.Add(DataRowToEntity(row));
                 }
             }
 
