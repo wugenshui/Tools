@@ -15,18 +15,41 @@
 //***************************************************
 using GMSCommon;
 using GMSModel;
+using HuaweiSoftware.Common.Database;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Web;
 
 namespace <%=命名空间%>
 {
-    public partial class <%= GetDAL(数据表) %>
+    public partial class <%= GetDAL(数据表) %> : BaseDAL
     {
-        private <%= GetModel(数据表) %> DataRowToEntity(DataRow row)
+        public <%= GetDAL(数据表) %>() : base(DatabaseHelper.GetConnectionString(), "<%=数据表 %>")
+        {
+            base.KeyScopeType = ScopeTypes.Database;
+<%if(((bool)数据表.Columns[0].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>
+            base.IsAutoGrow = false;
+<%} %>
+        }
+
+        public <%= GetModel(数据表) %> DataRowToEntity(DataRow dataReader)
+        {
+            <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
+        	<%
+        		foreach(ColumnSchema col in 数据表.Columns)
+                {
+            %>
+            info.<%= col.Name %> = <%= GetParseValue(col) %>;
+            <%         
+                }
+            %>
+
+            return info;
+        }
+
+        protected override object DataReaderToEntity(IDataReader dataReader)
         {
             <%= GetModel(数据表) %> info = new <%= GetModel(数据表) %>();
         	<%
@@ -43,112 +66,28 @@ namespace <%=命名空间%>
 
         public bool IsExist(object id)
         {
-            int count = 0;
-            string sql = "SELECT count(*) FROM <%=数据表.Name%> WHERE ID=@id";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                new SqlParameter("id",id),
-            };
-            object counter = SqlHelper.ExecuteScalar(sql, param);
-            int.TryParse(counter.ToString(), out count);
-
-            return count > 0;
+            return base.IsExistRecord("ID=" + id);
         }
 
         public <%= GetModel(数据表) %> FindByID(object id)
         {
-            <%= GetModel(数据表) %> result = null;
-            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
-                            FROM <%=数据表.Name%>
-                            WHERE ID=@id";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                new SqlParameter("id",id),
-            };
-            DataTable table = SqlHelper.ExecuteDataset(sql, param).Tables[0];
-            if (table != null && table.Rows.Count > 0)
-            {
-                result = DataRowToEntity(table.Rows[0]);
-            }
-
-            return result;
+            return base.FindByKey(id) as <%= GetModel(数据表) %>;
         }
 
-        public List<<%= GetModel(数据表) %>> Find(string filterStr = null, SqlParameter[] param = null, string orderFields = null)
+        public List<<%= GetModel(数据表) %>> Find(string filterStr = "", SqlParameter[] param = null, string orderFields = null)
         {
-            List<<%= GetModel(数据表) %>> result = new List<<%= GetModel(数据表) %>>();
-            string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
-                            FROM <%=数据表.Name%>";
-            if (filterStr != null)
+            if (string.IsNullOrWhiteSpace(filterStr))
             {
-                sql += " Where " + filterStr;
+                filterStr = "1=1";
             }
-            if (orderFields != null)
+            if (string.IsNullOrWhiteSpace(orderFields))
             {
-                sql += " Order By " + orderFields;
+                return base.Find(filterStr, param).Cast<<%= GetModel(数据表) %>>().ToList();
             }
-            DataTable table = SqlHelper.ExecuteDataset(sql, param).Tables[0];
-            if (table != null && table.Rows.Count > 0)
+            else
             {
-                foreach (DataRow row in table.Rows)
-                {
-                    result.Add(DataRowToEntity(row));
-                }
+                return base.Find(filterStr, param, orderFields).Cast<<%= GetModel(数据表) %>>().ToList();
             }
-
-            return result;
-        }
-
-        public int Insert(<%= GetModel(数据表) %> model)
-        {
-        <%if(((bool)数据表.Columns[0].ExtendedProperties["CS_IsIdentity"].Value) == true) { %>
-            int count = 0;
-            string sql = @"INSERT INTO <%=数据表.Name%>
-                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
-                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
-                        SELECT SCOPE_IDENTITY();";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
-            };
-            object counter = SqlHelper.ExecuteScalar(sql, param);
-            int.TryParse(counter.ToString(), out count);
-            return count;
-        <% } else { %>
-            string sql = @"INSERT INTO <%=数据表.Name%>
-                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
-                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
-            };
-            SqlHelper.ExecuteNonQuery(sql, param);
-            return model.ID;
-        <% } %>
-        }
-
-        public int Update(<%= GetModel(数据表) %> model)
-        {
-            string sql = @"UPDATE <%=数据表.Name%>
-                            SET <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% }%><% } %>
-                            WHERE ID=@ID";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
-            };
-
-            return SqlHelper.ExecuteNonQuery(sql, param);
-        }
-
-        public int Delete(object id)
-        {
-            string sql = "DELETE FROM <%=数据表.Name%> WHERE ID=@id";
-            SqlParameter[] param = new SqlParameter[]
-            {
-                new SqlParameter("id",id),
-            };
-
-            return SqlHelper.ExecuteNonQuery(sql, param);
         }
     }
 }
@@ -180,33 +119,33 @@ namespace <%=命名空间%>
 			case DbType.AnsiStringFixedLength:
             case DbType.String:
 			case DbType.StringFixedLength:
-                return "row[\"" + col.Name + "\"].ToString()";
+                return "dataReader[\"" + col.Name + "\"].ToString()";
 			case DbType.Boolean: 
-                return "Convert.ToBoolean(row[\"" + col.Name + "\"])";
+                return "Convert.ToBoolean(dataReader[\"" + col.Name + "\"])";
 			case DbType.Byte: 
-                return "Convert.ToByte(row[\"" + col.Name + "\"])";
+                return "Convert.ToByte(dataReader[\"" + col.Name + "\"])";
 			case DbType.Date: 
 			case DbType.DateTime:
             case DbType.DateTime2:
             case DbType.Time:
-                return "Convert.ToDateTime(row[\"" + col.Name + "\"])";
+                return "Convert.ToDateTime(dataReader[\"" + col.Name + "\"])";
             case DbType.Currency:
 			case DbType.Decimal:
 			case DbType.Double: 
 			case DbType.Int32:
             case DbType.UInt32:
             case DbType.VarNumeric:
-                return "Convert.ToInt32(row[\"" + col.Name + "\"])";
+                return "Convert.ToInt32(dataReader[\"" + col.Name + "\"])";
             case DbType.UInt16:
             case DbType.Int16:
-                return "Convert.ToInt16(row[\"" + col.Name + "\"])";
+                return "Convert.ToInt16(dataReader[\"" + col.Name + "\"])";
             case DbType.Int64:
             case DbType.UInt64:
-                return "Convert.ToInt64(row[\"" + col.Name + "\"])";
+                return "Convert.ToInt64(dataReader[\"" + col.Name + "\"])";
 			case DbType.Guid: 
                 return "Guid.NewGuid()";
 			case DbType.Object: 
-                return "row[\"" + col.Name + "\"]";
+                return "dataReader[\"" + col.Name + "\"]";
 			case DbType.SByte: 
 			case DbType.Single: 
 			case DbType.Binary: 
