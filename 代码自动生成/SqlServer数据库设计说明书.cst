@@ -101,7 +101,7 @@
     [Category("基本设置")]
     public override string OutputFile
     {
-        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\GMS数据库文档.xls";}
+        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\SqlServer数据库文档.xls";}
         set {base.OutputFile = value;}
     }
 </script>

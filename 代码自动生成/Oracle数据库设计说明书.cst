@@ -9,9 +9,9 @@
 <%@ Assembly Name="CodeSmith.CustomProperties" %>
 <%@ Import Namespace="CodeSmith.CustomProperties" %>
 <%-- 参数 --%>
-<%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Inherits="OutputFileCodeTemplate" Default="" Category="基本设置" %>
-
-<meta charset="utf-8" />
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="c#" Src="" Debug="False" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchemaCollection" Default="" Category="基本设置" %>
 <table borderColor='black' border='1'>
 	<% foreach(TableSchema table in 数据表) { %>
             <tr><th colspan="8" style="font-size:20px;"><%= table.Name %></th></tr>
@@ -23,14 +23,11 @@
                 <td><%=isFirst ? "√" : ""%></td>
                 <td><%=isFirst ? "√" : ""%></td><% if(isFirst) { isFirst = false;} %>
                 <td><%=GetDataType(col)%></td>
-                <td><%=( col.DataType == DbType.String ? "" + col.Size : ""  )%></td>
+                <td><%=( col.DataType == DbType.String ? "" + col.Size / 2 : ""  )%></td>
                 <td></td>
-                <td><%=col.ExtendedProperties["CS_Default"].Value.ToString().Replace("((","").Replace("))","").ToLower()%></td>
+                <td><%=col.ExtendedProperties["CS_Default"].Value.ToString().ToLower()%></td>
             </tr>
-    <% } %>
-            <tr><th colspan="8"><%= table.Columns.Count %>列</th></tr>
-            <tr><th colspan="8" style="height:50px;"></th></tr>
-    <% } %>
+    <% } }%>  
 </table>
 <script runat="template">
     public override string GetFileName()
@@ -66,14 +63,15 @@
             case DbType.String:
             case DbType.AnsiString:
             case DbType.AnsiStringFixedLength:
-                return "nvarchar";
+                return "VARCHAR2";
             case DbType.Date:
 			case DbType.DateTime:
 			case DbType.DateTime2: 
-                return "datetime";
+                return "DATE";
             case DbType.Byte: 
             case DbType.Int32:
-                return "int";
+                return "NUMBER";
+                
                 
 			case DbType.Binary: return "byte[]";
 			case DbType.Boolean: return "bool";
@@ -95,13 +93,13 @@
 			default: return "__UNKNOWN__" + col.NativeType;
 		}
 	}
-
+    
     // 文件输出路径
     [FileDialog(FileDialogType.Save, Title="选择文件输出路径", Filter="Query Files (*.xls)|*.xls|All Files (*.*)|*.*", DefaultExtension=".xls")]
     [Category("基本设置")]
     public override string OutputFile
     {
-        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\GMS数据库文档.xls";}
+        get {return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)+"\\Oracle数据库文档.xls";}
         set {base.OutputFile = value;}
     }
 </script>
