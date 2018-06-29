@@ -197,21 +197,21 @@ namespace <%=命名空间%>
             case DbType.UInt32:
             case DbType.VarNumeric:
                 if(col.AllowDBNull) {
-                    return "Convert.ToInt32(row[\"" + col.Name + "\"] as string)";    
+                    return "Convert.ToInt32(row[\"" + col.Name + "\"] == DBNull.Value ? null : row[\"" + col.Name + "\"])";
                 } else {
                     return "Convert.ToInt32(row[\"" + col.Name + "\"])";
                 }
             case DbType.UInt16:
             case DbType.Int16:
                 if(col.AllowDBNull) {
-                    return "Convert.ToInt16(row[\"" + col.Name + "\"] as string)";    
+                    return "Convert.ToInt16(row[\"" + col.Name + "\"]==DBNull.Value ? null : row[\"" + col.Name + "\"])";
                 } else {
                     return "Convert.ToInt16(row[\"" + col.Name + "\"])";
                 }
             case DbType.Int64:
             case DbType.UInt64:
                 if(col.AllowDBNull) {
-                    return "Convert.ToInt64(row[\"" + col.Name + "\"] as string)";    
+                    return "Convert.ToInt64(row[\"" + col.Name + "\"]==DBNull.Value ? null : row[\"" + col.Name + "\"])";
                 } else {
                     return "Convert.ToInt64(row[\"" + col.Name + "\"])";
                 }
