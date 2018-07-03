@@ -7,7 +7,7 @@
 
 
 <%-- 参数 --%>
-<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
+<%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="True" %>
 
 <%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.TYDAL" Category="基本设置" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
@@ -107,7 +107,7 @@ namespace <%=命名空间%>
             int count = 0;
             string sql = @"INSERT INTO <%=数据表.Name%>
                         (<% for(int i=0;i<GetNotIdentityColumns().Count;i++) { %><%=GetNotIdentityColumns()[i] + ((i>=GetNotIdentityColumns().Count-1)?"":",")%><% } %>)
-                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
+                        VALUES (<% for(int i=0;i<GetNotIdentityColumns().Count;i++) { %>@<%=GetNotIdentityColumns()[i] + ((i>=GetNotIdentityColumns().Count-1)?"":",")%><% } %>);
                         SELECT SCOPE_IDENTITY();";
             SqlParameter[] param = new SqlParameter[]
             {
@@ -132,7 +132,7 @@ namespace <%=命名空间%>
         public int Update(<%= GetModel(数据表) %> model)
         {
             string sql = @"UPDATE <%=数据表.Name%>
-                            SET <% for(int i=0;i<数据表.Columns.Count;i++) { if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>
+                            SET <% for(int i=0;i<GetNotIDColumns().Count;i++) { %><%=GetNotIDColumns()[i]+"=@"+GetNotIDColumns()[i] + ((i>=GetNotIDColumns().Count-1)?"":",")%><% } %>
                             WHERE ID=@ID";
             SqlParameter[] param = new SqlParameter[]
             {
@@ -169,15 +169,23 @@ namespace <%=命名空间%>
     }
     public List<string> GetNotIdentityColumns()
     {
-		List<string> _NotIdentityColumns = new List<string>();
-		if(_NotIdentityColumns.Count <= 0) {
-			for(int i=0;i<数据表.Columns.Count;i++) {
-				if((((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false)) {
-					_NotIdentityColumns.Add(数据表.Columns[i].Name);
-				}
+        List<string> _NotIdentityColumns = new List<string>();
+		for(int i=0;i<数据表.Columns.Count;i++) {
+			if((((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false)) {
+				_NotIdentityColumns.Add(数据表.Columns[i].Name);
 			}
 		}
 		return _NotIdentityColumns;
+    }
+    public List<string> GetNotIDColumns()
+    {
+        List<string> _NotIDColumns = new List<string>();
+		for(int i=0;i<数据表.Columns.Count;i++) {
+			if(数据表.Columns[i].Name != "ID") {
+				_NotIDColumns.Add(数据表.Columns[i].Name);
+			}
+		}
+		return _NotIDColumns;
     }
     /// <summary>
     /// 获取C#数据类型默认值
