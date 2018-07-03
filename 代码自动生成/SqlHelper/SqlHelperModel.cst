@@ -3,20 +3,23 @@
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
 <%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
 
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
 
-<%@ Property Name="命名空间" Type="String" Default="HuaweiSoftware.TYModel" Category="基本设置" %>
-<%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="基本设置" %>
-<%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Default="" Category="基本设置" %>
+<%@ Property Name="命名空间" Type="String" Default="Model" Category="Model" %>
+<%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="Model" %>
+<%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Category="Model" %>
+<%@ Property Name="Usings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;" Category="Model" %>
 //***************************************************
 //Author : chenbo
 //Description : 本文件由CodeSmith工具自动生成，请勿修改
 //***************************************************
-using HuaweiSoftware.TYCommon;
-using System;
-using System.Collections.Generic;
+<% foreach(var u in Usings) { %>
+<%=u %>
+<% } %>
 
 namespace <%=命名空间%>
 {
@@ -69,8 +72,7 @@ namespace <%=命名空间%>
     {
         return GetModel(数据表) + ".cs";
     }
-    
-    #region 获取列类型和默认值
+
 	/// <summary>
 	/// 获取C#数据类型
 	/// </summary>
@@ -168,5 +170,4 @@ namespace <%=命名空间%>
 				return "__UNKNOWN__" + col.NativeType;
 		}
 	}
-    #endregion
 </script>
