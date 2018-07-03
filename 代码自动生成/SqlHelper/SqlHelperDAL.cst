@@ -3,6 +3,8 @@
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Assembly Name="System.Data" %>
 <%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Collections.Generic" %>
+
 
 <%-- 参数 --%>
 <%@ CodeTemplate ResponseEncoding="UTF-8" Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" %>
@@ -101,11 +103,11 @@ namespace <%=命名空间%>
 
         public int Insert(<%= GetModel(数据表) %> model)
         {
-        <%if(((bool)数据表.Columns[0].ExtendedProperties["CS_IsIdentity"].Value) == true) { %>
+        <%if(((bool)数据表.Columns["ID"].ExtendedProperties["CS_IsIdentity"].Value) == true) { // ID是自增长标识符，不需要插入ID %>
             int count = 0;
             string sql = @"INSERT INTO <%=数据表.Name%>
-                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
-                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
+                        (<% for(int i=0;i<GetNotIdentityColumns().Count;i++) { %><%=GetNotIdentityColumns()[i] + ((i>=GetNotIdentityColumns().Count-1)?"":",")%><% } %>)
+                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>);
                         SELECT SCOPE_IDENTITY();";
             SqlParameter[] param = new SqlParameter[]
             {
@@ -114,13 +116,13 @@ namespace <%=命名空间%>
             object counter = SqlHelper.ExecuteScalar(sql, param);
             int.TryParse(counter.ToString(), out count);
             return count;
-        <% } else { %>
+        <% } else { // ID不是自增长标识符，需要插入ID %>
             string sql = @"INSERT INTO <%=数据表.Name%>
-                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)
-                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>)";
+                        (<% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>)
+                        VALUES (<% for(int i=0;i<数据表.Columns.Count;i++) { %>@<%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>)";
             SqlParameter[] param = new SqlParameter[]
             {
-                <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false) {%>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } } %>
+                <% for(int i=0;i<数据表.Columns.Count;i++) { %>new SqlParameter("<%=数据表.Columns[i].Name%>",model.<%=数据表.Columns[i].Name+"),"+((i>=数据表.Columns.Count-1)?"":"\r\n                ")%><% } %>
             };
             SqlHelper.ExecuteNonQuery(sql, param);
             return model.ID;
@@ -130,7 +132,7 @@ namespace <%=命名空间%>
         public int Update(<%= GetModel(数据表) %> model)
         {
             string sql = @"UPDATE <%=数据表.Name%>
-                            SET <% for(int i=0;i<数据表.Columns.Count;i++) { %><%if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% }%><% } %>
+                            SET <% for(int i=0;i<数据表.Columns.Count;i++) { if(数据表.Columns[i].Name != "ID") { %><%=数据表.Columns[i].Name+"=@"+数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } } %>
                             WHERE ID=@ID";
             SqlParameter[] param = new SqlParameter[]
             {
@@ -161,12 +163,22 @@ namespace <%=命名空间%>
 	{
 		return (table.Name.Substring(table.Name.IndexOf("_") + 1)).Replace("_","") + "Info";
 	}
-    public override string GetFileName()
+	public override string GetFileName()
     {
         return GetDAL(数据表) + ".cs";
     }
-    
-    #region 获取列类型和默认值
+    public List<string> GetNotIdentityColumns()
+    {
+		List<string> _NotIdentityColumns = new List<string>();
+		if(_NotIdentityColumns.Count <= 0) {
+			for(int i=0;i<数据表.Columns.Count;i++) {
+				if((((bool)数据表.Columns[i].ExtendedProperties["CS_IsIdentity"].Value) == false)) {
+					_NotIdentityColumns.Add(数据表.Columns[i].Name);
+				}
+			}
+		}
+		return _NotIdentityColumns;
+    }
     /// <summary>
     /// 获取C#数据类型默认值
     /// </summary>
@@ -227,5 +239,4 @@ namespace <%=命名空间%>
 				return "__UNKNOWN__" + col.NativeType;
 		}
 	}
-    #endregion
 </script>
