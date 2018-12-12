@@ -6,12 +6,12 @@
 
 <%-- 数据库 --%>
 <%@ Property Name="数据库" Type="SchemaExplorer.TableSchemaCollection" DeepLoad="True" Optional="False" Category="基本设置"%>
-<%@ Property Name="Model文件夹" Type="String" Default="Model" Optional="False" Category="Model"%>
-<%@ Property Name="ModelUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using DeadLock.Common;,using System;,using System.Collections.Generic;" Category="Model" %>
+<%@ Property Name="Model文件夹" Type="String" Default="" Optional="False" Category="Model"%>
+<%@ Property Name="ModelUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using common;,using System;,using System.Collections.Generic;" Category="Model" %>
 <%@ Property Name="Model命名空间" Type="String" Default="DeadLock.Model" Category="Model" %>
 <%@ Property Name="DAL文件夹" Type="String" Default="" Optional="False" Category="DAL"%>
 <%@ Property Name="DAL命名空间" Type="String" Default="DeadLock.DAL" Category="DAL" %>
-<%@ Property Name="DALUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using DeadLock.Common;,using DeadLock.Model;,using System;,using System.Collections.Generic;,using System.Data;,using System.Data.SqlClient;,using System.Linq;,using System.Web;" Category="DAL" %>
+<%@ Property Name="DALUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using common;,using DeadLock.Model;,using System;,using System.Collections.Generic;,using System.Data;,using System.Data.SqlClient;,using System.Linq;,using System.Web;" Category="DAL" %>
 <%@ Property Name="BLL文件夹" Type="String" Default="" Optional="False" Category="BLL"%>
 
 <% GenerateFiles();%>
