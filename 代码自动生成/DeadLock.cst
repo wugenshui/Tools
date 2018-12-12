@@ -1,0 +1,70 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="实体层、DAL层、BLL层代码生成模板" ResponseEncoding="UTF-8"%>
+
+<%-- 注册数据表生成模板 --%>
+<%@ Register Name="ModelTemplate" Template="./SqlHelper/SqlHelperModel.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+<%@ Register Name="DALTemplate" Template="./SqlHelper/SqlHelperDAL.cst" MergeProperties="Flase" ExcludeProperties="" Description="实体层模板" %>
+
+<%-- 数据库 --%>
+<%@ Property Name="数据库" Type="SchemaExplorer.TableSchemaCollection" DeepLoad="True" Optional="False" Category="基本设置"%>
+<%@ Property Name="Model文件夹" Type="String" Default="Model" Optional="False" Category="Model"%>
+<%@ Property Name="ModelUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using DeadLock.Common;,using System;,using System.Collections.Generic;" Category="Model" %>
+<%@ Property Name="Model命名空间" Type="String" Default="DeadLock.Model" Category="Model" %>
+<%@ Property Name="DAL文件夹" Type="String" Default="" Optional="False" Category="DAL"%>
+<%@ Property Name="DAL命名空间" Type="String" Default="DeadLock.DAL" Category="DAL" %>
+<%@ Property Name="DALUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using DeadLock.Common;,using DeadLock.Model;,using System;,using System.Collections.Generic;,using System.Data;,using System.Data.SqlClient;,using System.Linq;,using System.Web;" Category="DAL" %>
+<%@ Property Name="BLL文件夹" Type="String" Default="" Optional="False" Category="BLL"%>
+
+<% GenerateFiles();%>
+生成成功！ 路径：<%= 输出路径 %>
+<script runat="template">
+    /// <summary>
+    /// 遍历数据库所有的表，生成对应模板文件
+    /// </summary>   
+    private void GenerateFiles()
+    {
+        ModelTemplate model = new ModelTemplate();
+        DALTemplate dal = new DALTemplate();
+        
+        foreach(TableSchema table in 数据库)
+        {
+            // 实体层
+            string modelPath = 输出路径 +"\\"+ Model文件夹+"\\BaseModel\\"+ GetParseName(table) + "Info.cs";
+            model.SetProperty("数据表",table);
+            model.SetProperty("Usings",ModelUsings);
+            model.SetProperty("命名空间",Model命名空间);
+            model.RenderToFile(modelPath,true);
+            // DAL
+            string dalPath = 输出路径 +"\\"+DAL文件夹+"\\BaseDAL\\"+ GetParseName(table) + "DAL.cs";
+            dal.SetProperty("数据表",table);
+            dal.SetProperty("Usings",DALUsings);
+            dal.SetProperty("命名空间",DAL命名空间);
+            dal.RenderToFile(dalPath,true);
+        }
+    }
+    
+    public string GetParseName(TableSchema table)
+    {
+		return table.Name.Substring(table.Name.IndexOf("_") + 1).Replace("_","");
+    }
+    
+    // 文件输出路径
+    private string _Directory = String.Empty;
+    [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+    [Optional, NotChecked]
+    [Category("基本设置")]
+    public string 输出路径
+    { 
+        get
+        {
+            if (_Directory.Length == 0) 
+                _Directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            return _Directory;
+        }
+        set
+        {
+            if (value.EndsWith("\\")) 
+                value = value.Substring(0, value.Length -1);
+                _Directory = value;
+        }
+    }
+</script>
