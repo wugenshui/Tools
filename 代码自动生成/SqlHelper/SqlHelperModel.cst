@@ -13,6 +13,7 @@
 <%@ Property Name="是否包含可空标志" Type="Boolean" Default="false" Category="Model" %>
 <%@ Property Name="数据表" Type="SchemaExplorer.TableSchema" Category="Model" %>
 <%@ Property Name="Usings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;" Category="Model" %>
+<%@ Property Name="是否将序列化首字母小写" Type="Boolean" Default="false" Category="Model" %>
 //***************************************************
 //Author : chenbo
 //Description : 本文件由CodeSmith工具自动生成，请勿修改
@@ -49,6 +50,9 @@ namespace <%=命名空间%>
         /// <%=col.Description.Replace("\r\n","").Replace("\n","") %>
         /// </summary>
     <% } %>
+    <% if(!是否将序列化首字母小写) { %>
+        [JsonProperty("<%= OneToLower(col.Name)%>")]
+    <% } %>
         public <%=GetDataType(col)%> <%=col.Name%>
         {
             get { return m_<%=col.Name%>; }
@@ -71,6 +75,11 @@ namespace <%=命名空间%>
     public override string GetFileName() 
     {
         return GetModel(数据表) + ".cs";
+    }
+    
+    private string OneToLower(string str)
+    {
+        return str.Substring(0,1).ToLower() + str.Substring(1);
     }
 
 	/// <summary>
