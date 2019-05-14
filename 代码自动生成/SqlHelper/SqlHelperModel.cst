@@ -79,6 +79,7 @@ namespace <%=命名空间%>
     
     private string OneToLower(string str)
     {
+        str = str.Replace("OU","Ou").Replace("ID","Id").Replace("_","");
         return str.Substring(0,1).ToLower() + str.Substring(1);
     }
 
@@ -150,7 +151,7 @@ namespace <%=命名空间%>
 			case DbType.DateTime:
             case DbType.DateTime2:
             case DbType.Time:
-                return "CommonHelper.DefaultDateTime";
+                return "CommonHelper.DEFAULT_DATETIME";
             case DbType.Currency:
 			case DbType.Decimal:
 			case DbType.Double: 
