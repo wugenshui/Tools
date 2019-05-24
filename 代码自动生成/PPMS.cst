@@ -6,12 +6,12 @@
 
 <%-- 数据库 --%>
 <%@ Property Name="数据库" Type="SchemaExplorer.TableSchemaCollection" DeepLoad="True" Optional="False" Category="基本设置"%>
-<%@ Property Name="Model文件夹" Type="String" Default="PPMSModel" Optional="False" Category="Model"%>
-<%@ Property Name="ModelUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;,,using Newtonsoft.Json;,,using HuaweiSoftware.PPMS.PPMSCommon;" Category="Model" %>
-<%@ Property Name="Model命名空间" Type="String" Default="HuaweiSoftware.PPMS.PPMSModel" Category="Model" %>
-<%@ Property Name="DAL文件夹" Type="String" Default="PPMSDAL" Optional="False" Category="DAL"%>
-<%@ Property Name="DAL命名空间" Type="String" Default="HuaweiSoftware.PPMS.PPMSDAL" Category="DAL" %>
-<%@ Property Name="DALUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;,using System.Data;,using System.Data.SqlClient;,using System.Linq;,,using HuaweiSoftware.PPMS.PPMSCommon;,using HuaweiSoftware.PPMS.PPMSModel;" Category="DAL" %>
+<%@ Property Name="Model文件夹" Type="String" Default="PWMSModel" Optional="False" Category="Model"%>
+<%@ Property Name="ModelUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;,,using Newtonsoft.Json;,,using HuaweiSoftware.PWMS.PWMSCommon;" Category="Model" %>
+<%@ Property Name="Model命名空间" Type="String" Default="HuaweiSoftware.PWMS.PWMSModel" Category="Model" %>
+<%@ Property Name="DAL文件夹" Type="String" Default="PWMSDAL" Optional="False" Category="DAL"%>
+<%@ Property Name="DAL命名空间" Type="String" Default="HuaweiSoftware.PWMS.PWMSDAL" Category="DAL" %>
+<%@ Property Name="DALUsings" Type="CodeSmith.CustomProperties.StringCollection" Default="using System;,using System.Collections.Generic;,using System.Data;,using System.Data.SqlClient;,using System.Linq;,,using HuaweiSoftware.PWMS.PWMSCommon;,using HuaweiSoftware.PWMS.PWMSModel;" Category="DAL" %>
 <%@ Property Name="是否将序列化首字母小写" Type="Boolean" Default="true" Category="Model" %>
 
 <% GenerateFiles();%>

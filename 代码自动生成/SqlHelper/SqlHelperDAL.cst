@@ -78,11 +78,11 @@ namespace <%=命名空间%>
             List<<%= GetModel(数据表) %>> result = new List<<%= GetModel(数据表) %>>();
             string sql = @"SELECT <% for(int i=0;i<数据表.Columns.Count;i++) { %><%=数据表.Columns[i].Name + ((i>=数据表.Columns.Count-1)?"":",")%><% } %>
                             FROM <%=数据表.Name%>";
-            if (filterStr != null)
+            if (!string.IsNullOrWhiteSpace(filterStr))
             {
                 sql += " Where " + filterStr;
             }
-            if (orderFields != null)
+            if (!string.IsNullOrWhiteSpace(orderFields))
             {
                 sql += " Order By " + orderFields;
             }
