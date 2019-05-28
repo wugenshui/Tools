@@ -236,9 +236,6 @@ namespace <%=命名空间%>
             case DbType.DateTime2:
             case DbType.Time:
                 return "Convert.ToDateTime(row[\"" + col.Name + "\"])";
-            case DbType.Currency:
-			case DbType.Decimal:
-			case DbType.Double: 
 			case DbType.Int32:
             case DbType.UInt32:
             case DbType.VarNumeric:
@@ -246,6 +243,19 @@ namespace <%=命名空间%>
                     return "Convert.ToInt32(row[\"" + col.Name + "\"] == DBNull.Value ? null : row[\"" + col.Name + "\"])";
                 } else {
                     return "Convert.ToInt32(row[\"" + col.Name + "\"])";
+                }
+            case DbType.Currency:
+            case DbType.Decimal:
+                if(col.AllowDBNull) {
+                    return "Convert.ToDecimal(row[\"" + col.Name + "\"] == DBNull.Value ? null : row[\"" + col.Name + "\"])";
+                } else {
+                    return "Convert.ToDecimal(row[\"" + col.Name + "\"])";
+                }
+            case DbType.Double:
+                if(col.AllowDBNull) {
+                    return "Convert.ToDouble(row[\"" + col.Name + "\"] == DBNull.Value ? null : row[\"" + col.Name + "\"])";
+                } else {
+                    return "Convert.ToDouble(row[\"" + col.Name + "\"])";
                 }
             case DbType.UInt16:
             case DbType.Int16:
